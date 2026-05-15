@@ -1,0 +1,198 @@
+# =============================================================================
+# Production overlay — used together with docker-compose.yml:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml \
+#                  --env-file .env.prod up -d
+#
+# What this file changes vs the dev compose:
+#   • NODE_ENV=production everywhere
+#   • Real secrets and URLs come from .env.prod
+#   • Internal service ports are NOT exposed to the host (only gateway + signaling)
+#   • coturn uses the real public IP from SERVER_HOST
+#   • MinIO public endpoint points to the real VPS IP
+#   • RabbitMQ management UI is not exposed
+# =============================================================================
+
+name: telegram-prod
+
+x-prod-env: &prod-env
+  NODE_ENV: production
+  JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+  RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+  RABBITMQ_EXCHANGE: telegram.events
+  OUTBOX_POLL_INTERVAL_MS: 2000
+  OUTBOX_BATCH_SIZE: 50
+  OUTBOX_LOCK_TIMEOUT_MS: 30000
+
+services:
+  # ---------------------------------------------------------------------------
+  # Infrastructure
+  # ---------------------------------------------------------------------------
+
+  postgres:
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports: !reset []  # not exposed externally
+
+  rabbitmq:
+    ports: !reset []  # management UI not exposed externally
+
+  redis:
+    ports: !reset []
+
+  minio:
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    ports:
+      - "9000:9000"  # needed for presigned upload URLs from mobile
+
+  minio-bootstrap:
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_DEFAULT_BUCKET: ${MINIO_DEFAULT_BUCKET:-telegram-media}
+
+  coturn:
+    command:
+      - -n
+      - --log-file=stdout
+      - --realm=${SERVER_HOST}
+      - --listening-port=3478
+      - --min-port=49152
+      - --max-port=49200
+      - --lt-cred-mech
+      - --use-auth-secret
+      - --static-auth-secret=${TURN_SHARED_SECRET}
+      - --external-ip=${SERVER_HOST}
+
+  # ---------------------------------------------------------------------------
+  # Backend services — not exposed externally (traffic goes via api-gateway)
+  # ---------------------------------------------------------------------------
+
+  identity-service:
+    ports: !reset []
+    environment:
+      <<: *prod-env
+      PORT: 3001
+      IDENTITY_DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/telegram_identity
+      JWT_ACCESS_TTL_SECONDS: 900
+
+  profile-service:
+    ports: !reset []
+    environment:
+      <<: *prod-env
+      PORT: 3004
+      PROFILE_DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/telegram_profile
+      IDENTITY_SERVICE_URL: http://identity-service:3001
+      CONTACTS_SERVICE_URL: http://contacts-service:3005
+      CHAT_SERVICE_URL: http://chat-service:3002
+
+  chat-service:
+    ports: !reset []
+    environment:
+      <<: *prod-env
+      PORT: 3002
+      CHAT_DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/telegram_chat
+      PROFILE_SERVICE_URL: http://profile-service:3004
+      MESSAGE_SERVICE_URL: http://message-service:3003
+
+  message-service:
+    ports: !reset []
+    environment:
+      <<: *prod-env
+      PORT: 3003
+      MESSAGE_DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/telegram_message
+      CHAT_SERVICE_URL: http://chat-service:3002
+      PROFILE_SERVICE_URL: http://profile-service:3004
+
+  contacts-service:
+    ports: !reset []
+    environment:
+      <<: *prod-env
+      PORT: 3005
+      CONTACTS_DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/telegram_contacts
+      IDENTITY_SERVICE_URL: http://identity-service:3001
+      PROFILE_SERVICE_URL: http://profile-service:3004
+
+  media-service:
+    ports: !reset []
+    environment:
+      <<: *prod-env
+      PORT: 3006
+      MEDIA_DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/telegram_media
+      MEDIA_UPLOAD_URL_TTL_SECONDS: 900
+      MEDIA_PUBLIC_BASE_URL: ""
+      MESSAGE_SERVICE_URL: http://message-service:3003
+      PROFILE_SERVICE_URL: http://profile-service:3004
+      STORAGE_S3_ENDPOINT: http://minio:9000
+      STORAGE_S3_PUBLIC_ENDPOINT: http://${SERVER_HOST}:9000
+      STORAGE_S3_BUCKET: ${MINIO_DEFAULT_BUCKET:-telegram-media}
+      STORAGE_S3_REGION: us-east-1
+      STORAGE_S3_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
+      STORAGE_S3_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
+      STORAGE_S3_FORCE_PATH_STYLE: "true"
+
+  notification-service:
+    ports: !reset []
+    environment:
+      <<: *prod-env
+      PORT: 3008
+      CALLS_V1_ENABLED: "true"
+      NOTIFICATION_DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/telegram_notification
+      VOIP_PROVIDER_MODE: ${VOIP_PROVIDER_MODE:-dry_run}
+      VOIP_APNS_TOPIC: ${VOIP_APNS_TOPIC:-}
+      VOIP_APNS_KEY_ID: ${VOIP_APNS_KEY_ID:-}
+      VOIP_APNS_TEAM_ID: ${VOIP_APNS_TEAM_ID:-}
+      VOIP_APNS_AUTH_KEY_PATH: ${VOIP_APNS_AUTH_KEY_PATH:-}
+      VOIP_APNS_USE_SANDBOX: ${VOIP_APNS_USE_SANDBOX:-false}
+      PUSH_PROVIDER_MODE: ${PUSH_PROVIDER_MODE:-dry_run}
+      PUSH_APNS_TOPIC: ${PUSH_APNS_TOPIC:-}
+      PUSH_APNS_KEY_ID: ${PUSH_APNS_KEY_ID:-}
+      PUSH_APNS_TEAM_ID: ${PUSH_APNS_TEAM_ID:-}
+      PUSH_APNS_AUTH_KEY_PATH: ${PUSH_APNS_AUTH_KEY_PATH:-}
+      PUSH_APNS_USE_SANDBOX: ${PUSH_APNS_USE_SANDBOX:-false}
+
+  call-service:
+    ports:
+      - "3007:3007"  # exposed — mobile connects to WebSocket signaling directly
+    environment:
+      <<: *prod-env
+      PORT: 3007
+      CALLS_V1_ENABLED: "true"
+      CALL_DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/telegram_call
+      CHAT_SERVICE_URL: http://chat-service:3002
+      PROFILE_SERVICE_URL: http://profile-service:3004
+      MESSAGE_SERVICE_URL: http://message-service:3003
+      NOTIFICATION_SERVICE_URL: http://notification-service:3008
+      REDIS_URL: redis://redis:6379
+      CALL_SIGNALING_PUBLIC_URL: http://${SERVER_HOST}:3007/calls
+      CALL_SIGNALING_TOKEN_TTL_SECONDS: 60
+      CALL_RING_TIMEOUT_MS: 30000
+      CALL_STUN_URL: stun:${SERVER_HOST}:3478
+      CALL_TURN_URL: turn:${SERVER_HOST}:3478?transport=udp
+      CALL_TURN_SHARED_SECRET: ${TURN_SHARED_SECRET}
+      CALL_TURN_REALM: ${SERVER_HOST}
+      CALL_TURN_CREDENTIAL_TTL_SECONDS: 3600
+
+  # ---------------------------------------------------------------------------
+  # API Gateway — the only HTTP entry point for the mobile app
+  # ---------------------------------------------------------------------------
+
+  api-gateway:
+    ports:
+      - "3000:3000"
+    environment:
+      <<: *prod-env
+      PORT: 3000
+      CALLS_V1_ENABLED: "true"
+      IDENTITY_SERVICE_URL: http://identity-service:3001
+      PROFILE_SERVICE_URL: http://profile-service:3004
+      CHAT_SERVICE_URL: http://chat-service:3002
+      MESSAGE_SERVICE_URL: http://message-service:3003
+      NOTIFICATION_SERVICE_URL: http://notification-service:3008
+      CALL_SERVICE_URL: http://call-service:3007
+      CONTACTS_SERVICE_URL: http://contacts-service:3005
+      MEDIA_SERVICE_URL: http://media-service:3006
+      UPSTREAM_TIMEOUT_MS: 25000

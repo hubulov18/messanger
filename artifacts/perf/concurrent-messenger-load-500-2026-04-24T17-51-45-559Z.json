@@ -1,0 +1,322 @@
+{
+  "startedAt": "2026-04-24T17:51:13.421Z",
+  "finishedAt": "2026-04-24T17:51:45.555Z",
+  "baseUrl": "http://localhost:3000/v1",
+  "setup": {
+    "gatewayHealth": {
+      "ok": false,
+      "status": 404,
+      "body": {
+        "error": {
+          "code": "NOT_FOUND",
+          "message": "Cannot GET /health",
+          "details": "Cannot GET /health",
+          "requestId": "req_0169a70d-6eb8-49d3-8551-023d94f3beef"
+        }
+      }
+    },
+    "userCount": 500,
+    "chatCount": 250,
+    "setupConcurrency": 10,
+    "dataTag": "diag500e",
+    "chatListLimit": 20,
+    "messageListLimit": 20,
+    "sampleUsers": [
+      {
+        "userId": "user_4c747e91-f2ae-4afa-bde4-f0169e8ec8b3",
+        "phoneNumber": "+14153331150",
+        "chatId": "chat_d1a78b1e-b8c8-44d4-bed1-b89f81f4c97b",
+        "peerUserId": "user_6c91fe8c-a837-44c7-a67e-25481b05e1dd"
+      },
+      {
+        "userId": "user_6c91fe8c-a837-44c7-a67e-25481b05e1dd",
+        "phoneNumber": "+14154331150",
+        "chatId": "chat_d1a78b1e-b8c8-44d4-bed1-b89f81f4c97b",
+        "peerUserId": "user_4c747e91-f2ae-4afa-bde4-f0169e8ec8b3"
+      },
+      {
+        "userId": "user_ea558a2a-e1bc-4929-b418-cc3ca6710f2a",
+        "phoneNumber": "+14155331150",
+        "chatId": "chat_8ab33efe-1d31-4bec-aacd-cf776dee0cb3",
+        "peerUserId": "user_5c6fc379-fa10-4bd2-af9f-97d7f5b587ca"
+      },
+      {
+        "userId": "user_5c6fc379-fa10-4bd2-af9f-97d7f5b587ca",
+        "phoneNumber": "+14156331150",
+        "chatId": "chat_8ab33efe-1d31-4bec-aacd-cf776dee0cb3",
+        "peerUserId": "user_ea558a2a-e1bc-4929-b418-cc3ca6710f2a"
+      },
+      {
+        "userId": "user_2bec35a5-8967-4c0f-ab82-04b3f24841fc",
+        "phoneNumber": "+14157331150",
+        "chatId": "chat_1f7fb349-75af-4b7a-b333-5f0bd7f5242c",
+        "peerUserId": "user_8778934a-b209-4e53-883b-bd577edb60a0"
+      }
+    ],
+    "sampleChats": [
+      {
+        "chatId": "chat_d1a78b1e-b8c8-44d4-bed1-b89f81f4c97b",
+        "leftUserId": "user_4c747e91-f2ae-4afa-bde4-f0169e8ec8b3",
+        "rightUserId": "user_6c91fe8c-a837-44c7-a67e-25481b05e1dd"
+      },
+      {
+        "chatId": "chat_8ab33efe-1d31-4bec-aacd-cf776dee0cb3",
+        "leftUserId": "user_ea558a2a-e1bc-4929-b418-cc3ca6710f2a",
+        "rightUserId": "user_5c6fc379-fa10-4bd2-af9f-97d7f5b587ca"
+      },
+      {
+        "chatId": "chat_1f7fb349-75af-4b7a-b333-5f0bd7f5242c",
+        "leftUserId": "user_2bec35a5-8967-4c0f-ab82-04b3f24841fc",
+        "rightUserId": "user_8778934a-b209-4e53-883b-bd577edb60a0"
+      },
+      {
+        "chatId": "chat_05ae52cd-b897-4581-bb7e-e68209c050cf",
+        "leftUserId": "user_8b9af0c3-7388-448a-8584-e84a30d89b95",
+        "rightUserId": "user_22f17656-7c4e-4046-89ba-6f4106987aba"
+      },
+      {
+        "chatId": "chat_0df3d3d8-4fce-468f-8f54-e5528b109b45",
+        "leftUserId": "user_62c6b2f2-73c3-4ef1-94e7-27e5c97fa5a0",
+        "rightUserId": "user_fca8c5dc-e355-4337-b226-626b89a77d68"
+      }
+    ]
+  },
+  "summary": {
+    "scenario": {
+      "totalRequests": 500,
+      "successCount": 448,
+      "errorCount": 52,
+      "errorRate": 0.104,
+      "minMs": 8923.64,
+      "maxMs": 25342.98,
+      "p50Ms": 20024.8,
+      "p95Ms": 25063.8,
+      "p99Ms": 25317.59,
+      "failures": [
+        {
+          "status": null,
+          "durationMs": 15715.98,
+          "error": {
+            "error": {
+              "code": "BAD_GATEWAY",
+              "message": "Internal server error",
+              "requestId": "req_3486d7d8-1c56-4b59-b744-a1b57074b83d"
+            }
+          }
+        },
+        {
+          "status": null,
+          "durationMs": 15815.58,
+          "error": {
+            "error": {
+              "code": "BAD_GATEWAY",
+              "message": "Internal server error",
+              "requestId": "req_692dbff7-9267-4ebc-a783-996fd4df8f47"
+            }
+          }
+        },
+        {
+          "status": null,
+          "durationMs": 15827.91,
+          "error": {
+            "error": {
+              "code": "BAD_GATEWAY",
+              "message": "Internal server error",
+              "requestId": "req_5e42415f-e959-4309-ae98-9078a9565114"
+            }
+          }
+        },
+        {
+          "status": null,
+          "durationMs": 15868.96,
+          "error": {
+            "error": {
+              "code": "BAD_GATEWAY",
+              "message": "Internal server error",
+              "requestId": "req_63b8d14a-6e9a-40dc-84b7-555899bd56ac"
+            }
+          }
+        },
+        {
+          "status": null,
+          "durationMs": 15887.79,
+          "error": {
+            "error": {
+              "code": "BAD_GATEWAY",
+              "message": "Internal server error",
+              "requestId": "req_52d29db1-f83a-4b4d-ac64-2ed13fbf3d94"
+            }
+          }
+        }
+      ]
+    },
+    "getChats": {
+      "totalRequests": 500,
+      "successCount": 500,
+      "errorCount": 0,
+      "errorRate": 0,
+      "minMs": 139.86,
+      "maxMs": 23633.04,
+      "p50Ms": 7000.02,
+      "p95Ms": 23301.98,
+      "p99Ms": 23592.88,
+      "failures": []
+    },
+    "getMessages": {
+      "totalRequests": 500,
+      "successCount": 483,
+      "errorCount": 17,
+      "errorRate": 0.034,
+      "minMs": 62.58,
+      "maxMs": 14963.76,
+      "p50Ms": 5140.84,
+      "p95Ms": 11281.18,
+      "p99Ms": 14310.28,
+      "failures": [
+        {
+          "status": 502,
+          "durationMs": 10620.41,
+          "error": {
+            "error": {
+              "code": "BAD_GATEWAY",
+              "message": "The upstream service is unavailable.",
+              "details": {
+                "target": "message",
+                "path": "v1/chats/chat_e0a241bb-ea2a-4d6c-a67b-76ab93717d71/messages"
+              },
+              "requestId": "req_e2ee2378-9a8c-4b7b-9179-1a7112829f3e"
+            }
+          }
+        },
+        {
+          "status": 502,
+          "durationMs": 10622.96,
+          "error": {
+            "error": {
+              "code": "BAD_GATEWAY",
+              "message": "The upstream service is unavailable.",
+              "details": {
+                "target": "message",
+                "path": "v1/chats/chat_b9f5c912-9a81-4fca-b0a6-950cd7f55011/messages"
+              },
+              "requestId": "req_055c0d6a-fcbd-4e20-aa29-0e9ec91ac7fc"
+            }
+          }
+        },
+        {
+          "status": 502,
+          "durationMs": 10625.25,
+          "error": {
+            "error": {
+              "code": "BAD_GATEWAY",
+              "message": "The upstream service is unavailable.",
+              "details": {
+                "target": "message",
+                "path": "v1/chats/chat_b9f5c912-9a81-4fca-b0a6-950cd7f55011/messages"
+              },
+              "requestId": "req_59da483a-87fb-48a8-89d7-323f8c23e28b"
+            }
+          }
+        },
+        {
+          "status": 502,
+          "durationMs": 10635.15,
+          "error": {
+            "error": {
+              "code": "BAD_GATEWAY",
+              "message": "The upstream service is unavailable.",
+              "details": {
+                "target": "message",
+                "path": "v1/chats/chat_fb1c3c6d-207f-4627-a467-52fd95b11d61/messages"
+              },
+              "requestId": "req_cfa73a84-025c-4997-b21c-e712ec7d14ad"
+            }
+          }
+        },
+        {
+          "status": 502,
+          "durationMs": 10638.04,
+          "error": {
+            "error": {
+              "code": "BAD_GATEWAY",
+              "message": "The upstream service is unavailable.",
+              "details": {
+                "target": "message",
+                "path": "v1/chats/chat_f4addab8-f686-47d8-b2a6-a09671e37fa8/messages"
+              },
+              "requestId": "req_e24942a8-5ca6-4a3e-a03f-82d14ed8f16e"
+            }
+          }
+        }
+      ]
+    },
+    "postMessages": {
+      "totalRequests": 500,
+      "successCount": 465,
+      "errorCount": 35,
+      "errorRate": 0.07,
+      "minMs": 140.83,
+      "maxMs": 14438.54,
+      "p50Ms": 4135.75,
+      "p95Ms": 13534.17,
+      "p99Ms": 13739.59,
+      "failures": [
+        {
+          "status": 500,
+          "durationMs": 8206.14,
+          "error": {
+            "error": {
+              "code": "BAD_GATEWAY",
+              "message": "Internal server error",
+              "requestId": "req_3486d7d8-1c56-4b59-b744-a1b57074b83d"
+            }
+          }
+        },
+        {
+          "status": 500,
+          "durationMs": 3433.38,
+          "error": {
+            "error": {
+              "code": "BAD_GATEWAY",
+              "message": "Internal server error",
+              "requestId": "req_692dbff7-9267-4ebc-a783-996fd4df8f47"
+            }
+          }
+        },
+        {
+          "status": 500,
+          "durationMs": 3474.43,
+          "error": {
+            "error": {
+              "code": "BAD_GATEWAY",
+              "message": "Internal server error",
+              "requestId": "req_5e42415f-e959-4309-ae98-9078a9565114"
+            }
+          }
+        },
+        {
+          "status": 500,
+          "durationMs": 3344.92,
+          "error": {
+            "error": {
+              "code": "BAD_GATEWAY",
+              "message": "Internal server error",
+              "requestId": "req_63b8d14a-6e9a-40dc-84b7-555899bd56ac"
+            }
+          }
+        },
+        {
+          "status": 500,
+          "durationMs": 7780.32,
+          "error": {
+            "error": {
+              "code": "BAD_GATEWAY",
+              "message": "Internal server error",
+              "requestId": "req_52d29db1-f83a-4b4d-ac64-2ed13fbf3d94"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

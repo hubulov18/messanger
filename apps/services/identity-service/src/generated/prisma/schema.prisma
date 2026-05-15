@@ -1,0 +1,105 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("IDENTITY_DATABASE_URL")
+}
+
+enum AccountStatus {
+  pending
+  active
+  suspended
+  deleted
+}
+
+enum SessionClientType {
+  ios
+  android
+  web
+  desktop
+  unknown
+}
+
+enum OtpPurpose {
+  register
+  login
+  two_factor
+}
+
+enum OutboxEventStatus {
+  pending
+  published
+  failed
+}
+
+model UserAccount {
+  id               String        @id
+  phoneNumber      String?       @unique @map("phone_number")
+  phoneNumberHash  String?       @unique @map("phone_number_hash")
+  status           AccountStatus
+  twoFactorEnabled Boolean       @default(false) @map("two_factor_enabled")
+  createdAt        DateTime      @default(now()) @map("created_at")
+  verifiedAt       DateTime?     @map("verified_at")
+  sessions         Session[]
+
+  @@index([status])
+  @@index([phoneNumberHash])
+  @@map("user_accounts")
+}
+
+model Session {
+  id               String            @id
+  userAccountId    String            @map("user_account_id")
+  deviceId         String            @map("device_id")
+  clientType       SessionClientType @map("client_type")
+  refreshTokenHash String            @unique(map: "sessions_refresh_token_hash_key") @map("refresh_token_hash")
+  ipAddress        String?           @map("ip_address")
+  userAgent        String?           @map("user_agent")
+  createdAt        DateTime          @default(now()) @map("created_at")
+  lastSeenAt       DateTime?         @map("last_seen_at")
+  revokedAt        DateTime?         @map("revoked_at")
+  userAccount      UserAccount       @relation(fields: [userAccountId], references: [id])
+
+  @@index([userAccountId])
+  @@index([deviceId])
+  @@index([revokedAt])
+  @@map("sessions")
+}
+
+model OtpChallenge {
+  id           String     @id
+  target       String
+  purpose      OtpPurpose
+  codeHash     String     @map("code_hash")
+  attemptCount Int        @default(0) @map("attempt_count")
+  expiresAt    DateTime   @map("expires_at")
+  consumedAt   DateTime?  @map("consumed_at")
+  createdAt    DateTime   @default(now()) @map("created_at")
+
+  @@index([target])
+  @@index([expiresAt])
+  @@map("otp_challenges")
+}
+
+model OutboxEvent {
+  id           String            @id
+  eventType    String            @map("event_type")
+  eventVersion Int               @map("event_version")
+  aggregateId  String            @map("aggregate_id")
+  partitionKey String            @map("partition_key")
+  payloadJson  Json              @map("payload_json")
+  occurredAt   DateTime          @map("occurred_at")
+  publishedAt  DateTime?         @map("published_at")
+  status       OutboxEventStatus
+  attemptCount Int               @default(0) @map("attempt_count")
+  lastError    String?           @map("last_error")
+  lockedAt     DateTime?         @map("locked_at")
+  lockedBy     String?           @map("locked_by")
+
+  @@index([status, lockedAt, occurredAt])
+  @@index([lockedBy])
+  @@map("outbox_events")
+}

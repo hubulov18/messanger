@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Debug-only network security policy.
+
+    Android development regularly talks to local or LAN services over HTTP
+    (for example emulator-hosted API gateways, Metro-discovered hosts, or a
+    backend running on the current machine). Allow cleartext in debug builds
+    only so Android auth/chat flows match the existing iOS dev setup without
+    touching release security.
+-->
+<network-security-config>
+
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+
+</network-security-config>

@@ -1,0 +1,134 @@
+{
+  "startedAt": "2026-04-25T04:40:24.372Z",
+  "finishedAt": "2026-04-25T04:40:55.109Z",
+  "baseUrl": "http://localhost:3000/v1",
+  "setup": {
+    "gatewayHealth": {
+      "ok": false,
+      "status": 404,
+      "body": {
+        "error": {
+          "code": "NOT_FOUND",
+          "message": "Cannot GET /health",
+          "details": "Cannot GET /health",
+          "requestId": "req_1ebb37f7-56ab-4aba-9001-4dfb32d37219"
+        }
+      }
+    },
+    "userCount": 500,
+    "chatCount": 250,
+    "setupConcurrency": 10,
+    "dataTag": "access-cache-500",
+    "chatListLimit": 20,
+    "messageListLimit": 20,
+    "sampleUsers": [
+      {
+        "userId": "user_c838f100-33ea-44ad-8e48-708b66d38f80",
+        "phoneNumber": "+14159235518",
+        "chatId": "chat_0ed7f0ec-8a11-4426-a06c-f2ed644e8604",
+        "peerUserId": "user_00c56c6e-be75-4583-a0fc-5434f8562020"
+      },
+      {
+        "userId": "user_00c56c6e-be75-4583-a0fc-5434f8562020",
+        "phoneNumber": "+14152235519",
+        "chatId": "chat_0ed7f0ec-8a11-4426-a06c-f2ed644e8604",
+        "peerUserId": "user_c838f100-33ea-44ad-8e48-708b66d38f80"
+      },
+      {
+        "userId": "user_7d5fb918-16a4-4973-b6b9-938097e7a935",
+        "phoneNumber": "+14153235519",
+        "chatId": "chat_b51eb827-fd13-48f2-8e89-d897bd7f64ff",
+        "peerUserId": "user_239d8f1b-197b-40f5-be33-6d2a1e99557b"
+      },
+      {
+        "userId": "user_239d8f1b-197b-40f5-be33-6d2a1e99557b",
+        "phoneNumber": "+14154235519",
+        "chatId": "chat_b51eb827-fd13-48f2-8e89-d897bd7f64ff",
+        "peerUserId": "user_7d5fb918-16a4-4973-b6b9-938097e7a935"
+      },
+      {
+        "userId": "user_6389bae6-e930-4fbb-b191-c29fc09cbdb4",
+        "phoneNumber": "+14155235519",
+        "chatId": "chat_3d0a82bb-c511-441b-99a2-c62cceebff1d",
+        "peerUserId": "user_0aa073c2-7334-4273-a061-074bc64e3789"
+      }
+    ],
+    "sampleChats": [
+      {
+        "chatId": "chat_0ed7f0ec-8a11-4426-a06c-f2ed644e8604",
+        "leftUserId": "user_c838f100-33ea-44ad-8e48-708b66d38f80",
+        "rightUserId": "user_00c56c6e-be75-4583-a0fc-5434f8562020"
+      },
+      {
+        "chatId": "chat_b51eb827-fd13-48f2-8e89-d897bd7f64ff",
+        "leftUserId": "user_7d5fb918-16a4-4973-b6b9-938097e7a935",
+        "rightUserId": "user_239d8f1b-197b-40f5-be33-6d2a1e99557b"
+      },
+      {
+        "chatId": "chat_3d0a82bb-c511-441b-99a2-c62cceebff1d",
+        "leftUserId": "user_6389bae6-e930-4fbb-b191-c29fc09cbdb4",
+        "rightUserId": "user_0aa073c2-7334-4273-a061-074bc64e3789"
+      },
+      {
+        "chatId": "chat_14f0433c-5761-4847-b7c6-11e315a803c7",
+        "leftUserId": "user_1e301a26-14ec-425f-8c4d-37815e5f3199",
+        "rightUserId": "user_6732f812-fccb-4f0f-9e4f-32f7565e40f2"
+      },
+      {
+        "chatId": "chat_d6817357-50f1-4f41-855b-eebf49b9be53",
+        "leftUserId": "user_7c907e6d-fdb4-4a4b-92ca-982795f35c2c",
+        "rightUserId": "user_9a4cd206-546f-4c76-b41e-3fad7fcda5e8"
+      }
+    ]
+  },
+  "summary": {
+    "scenario": {
+      "totalRequests": 500,
+      "successCount": 500,
+      "errorCount": 0,
+      "errorRate": 0,
+      "minMs": 2960.17,
+      "maxMs": 16168.7,
+      "p50Ms": 11647.44,
+      "p95Ms": 15509.69,
+      "p99Ms": 16141.47,
+      "failures": []
+    },
+    "getChats": {
+      "totalRequests": 500,
+      "successCount": 500,
+      "errorCount": 0,
+      "errorRate": 0,
+      "minMs": 148.91,
+      "maxMs": 7677.74,
+      "p50Ms": 4180.43,
+      "p95Ms": 7318.08,
+      "p99Ms": 7649.67,
+      "failures": []
+    },
+    "getMessages": {
+      "totalRequests": 500,
+      "successCount": 500,
+      "errorCount": 0,
+      "errorRate": 0,
+      "minMs": 691.94,
+      "maxMs": 9928.84,
+      "p50Ms": 4374.76,
+      "p95Ms": 7436.5,
+      "p99Ms": 9854.83,
+      "failures": []
+    },
+    "postMessages": {
+      "totalRequests": 500,
+      "successCount": 500,
+      "errorCount": 0,
+      "errorRate": 0,
+      "minMs": 280.38,
+      "maxMs": 9670.79,
+      "p50Ms": 2579.5,
+      "p95Ms": 6401.63,
+      "p99Ms": 6969.9,
+      "failures": []
+    }
+  }
+}

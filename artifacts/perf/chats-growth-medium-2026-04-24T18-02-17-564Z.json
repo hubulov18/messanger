@@ -1,0 +1,60 @@
+{
+  "startedAt": "2026-04-24T18:02:07.250Z",
+  "finishedAt": "2026-04-24T18:02:17.564Z",
+  "baseUrl": "http://localhost:3000/v1",
+  "profile": {
+    "name": "medium",
+    "chatCount": 50,
+    "messagesPerChat": 5,
+    "measureLimit": 50,
+    "returnedChatsMayBeCappedByEndpoint": false
+  },
+  "setup": {
+    "gatewayHealth": {
+      "ok": false,
+      "status": 404,
+      "body": {
+        "error": {
+          "code": "NOT_FOUND",
+          "message": "Cannot GET /health",
+          "details": "Cannot GET /health",
+          "requestId": "req_be04a47e-6de4-43d9-bcc6-6518c88fb43e"
+        }
+      }
+    },
+    "ownerUserId": "user_ae2fa7aa-972c-44bd-a063-1e1b4b8d8f82",
+    "ownerPhoneNumber": "+14155552851",
+    "dataTag": "opt1",
+    "setupDurationMs": 8976.97,
+    "createdChatCount": 50,
+    "createdMessageCount": 250,
+    "sampleChatIds": [
+      "chat_d6635b44-e27f-48a8-88b0-b27680ee5517",
+      "chat_26f2885d-8bb2-4b6e-a3c9-8f863128fca4",
+      "chat_34015895-1ec6-4a93-a3e5-14b1735a92f8",
+      "chat_b98eadb8-64f1-4e3e-be73-65dd0a04019a",
+      "chat_c6f89012-8dc1-4166-94fc-30abb22edaec",
+      "chat_7cac16b0-b4bf-49a3-8118-8c2f1af48938",
+      "chat_0fe67dfc-b044-4bbe-8813-9f2b788a4a9d",
+      "chat_6ddfe2b5-33b2-44b4-8883-ca341752a302",
+      "chat_6405b34c-cab7-410c-b2b7-0b625b3bd2c4",
+      "chat_ce0cf3b5-9d4e-41bd-8063-198af4a2c404"
+    ]
+  },
+  "execution": {
+    "warmupIterations": 5,
+    "measurementIterations": 20
+  },
+  "summary": {
+    "totalRequests": 20,
+    "successCount": 20,
+    "errorCount": 0,
+    "errorRate": 0,
+    "minMs": 28.73,
+    "maxMs": 61.12,
+    "p50Ms": 38.45,
+    "p95Ms": 58.84,
+    "p99Ms": 61.12,
+    "failures": []
+  }
+}

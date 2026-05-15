@@ -1,0 +1,56 @@
+type EnvInput = Record<string, string | undefined>;
+
+type EnvOutput = {
+  PORT: string | undefined;
+  NODE_ENV: string | undefined;
+  CHAT_DATABASE_URL: string;
+  JWT_ACCESS_SECRET: string;
+  PROFILE_SERVICE_URL: string | undefined;
+  MESSAGE_SERVICE_URL: string | undefined;
+  RABBITMQ_URL: string | undefined;
+  RABBITMQ_EXCHANGE: string | undefined;
+  OUTBOX_POLL_INTERVAL_MS: string | undefined;
+  OUTBOX_BATCH_SIZE: string | undefined;
+  OUTBOX_LOCK_TIMEOUT_MS: string | undefined;
+  CHAT_MEMBERSHIP_PROJECTION_POLL_INTERVAL_MS: string | undefined;
+  CHAT_MEMBERSHIP_PROJECTION_BATCH_SIZE: string | undefined;
+  CHAT_MEMBERSHIP_PROJECTION_MAX_BATCHES_PER_TICK: string | undefined;
+  CHAT_SUMMARY_PROJECTION_SHADOW_READ_ENABLED: string | undefined;
+  CHAT_SUMMARY_PROJECTION_READ_ENABLED: string | undefined;
+  SLOW_REQUEST_THRESHOLD_MS: string | undefined;
+  SLOW_QUERY_THRESHOLD_MS: string | undefined;
+};
+
+export function validateEnv(config: EnvInput): EnvOutput {
+  const databaseUrl = config.CHAT_DATABASE_URL?.trim();
+  const jwtAccessSecret = config.JWT_ACCESS_SECRET?.trim();
+
+  if (!databaseUrl) {
+    throw new Error('CHAT_DATABASE_URL is required');
+  }
+
+  if (!jwtAccessSecret) {
+    throw new Error('JWT_ACCESS_SECRET is required');
+  }
+
+  return {
+    PORT: config.PORT,
+    NODE_ENV: config.NODE_ENV,
+    CHAT_DATABASE_URL: databaseUrl,
+    JWT_ACCESS_SECRET: jwtAccessSecret,
+    PROFILE_SERVICE_URL: config.PROFILE_SERVICE_URL,
+    MESSAGE_SERVICE_URL: config.MESSAGE_SERVICE_URL,
+    RABBITMQ_URL: config.RABBITMQ_URL,
+    RABBITMQ_EXCHANGE: config.RABBITMQ_EXCHANGE,
+    OUTBOX_POLL_INTERVAL_MS: config.OUTBOX_POLL_INTERVAL_MS,
+    OUTBOX_BATCH_SIZE: config.OUTBOX_BATCH_SIZE,
+    OUTBOX_LOCK_TIMEOUT_MS: config.OUTBOX_LOCK_TIMEOUT_MS,
+    CHAT_MEMBERSHIP_PROJECTION_POLL_INTERVAL_MS: config.CHAT_MEMBERSHIP_PROJECTION_POLL_INTERVAL_MS,
+    CHAT_MEMBERSHIP_PROJECTION_BATCH_SIZE: config.CHAT_MEMBERSHIP_PROJECTION_BATCH_SIZE,
+    CHAT_MEMBERSHIP_PROJECTION_MAX_BATCHES_PER_TICK: config.CHAT_MEMBERSHIP_PROJECTION_MAX_BATCHES_PER_TICK,
+    CHAT_SUMMARY_PROJECTION_SHADOW_READ_ENABLED: config.CHAT_SUMMARY_PROJECTION_SHADOW_READ_ENABLED,
+    CHAT_SUMMARY_PROJECTION_READ_ENABLED: config.CHAT_SUMMARY_PROJECTION_READ_ENABLED,
+    SLOW_REQUEST_THRESHOLD_MS: config.SLOW_REQUEST_THRESHOLD_MS,
+    SLOW_QUERY_THRESHOLD_MS: config.SLOW_QUERY_THRESHOLD_MS,
+  };
+}

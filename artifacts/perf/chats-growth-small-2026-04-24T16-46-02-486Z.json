@@ -1,0 +1,55 @@
+{
+  "startedAt": "2026-04-24T16:45:57.675Z",
+  "finishedAt": "2026-04-24T16:46:02.484Z",
+  "baseUrl": "http://localhost:3000/v1",
+  "profile": {
+    "name": "small",
+    "chatCount": 5,
+    "messagesPerChat": 1,
+    "measureLimit": 5,
+    "returnedChatsMayBeCappedByEndpoint": false
+  },
+  "setup": {
+    "gatewayHealth": {
+      "ok": false,
+      "status": 404,
+      "body": {
+        "error": {
+          "code": "NOT_FOUND",
+          "message": "Cannot GET /health",
+          "details": "Cannot GET /health",
+          "requestId": "req_83be8298-0890-487f-934b-a17a2d5b1c62"
+        }
+      }
+    },
+    "ownerUserId": "user_09271569-7c25-45d2-bace-7dbde17ed232",
+    "ownerPhoneNumber": "+14155552791",
+    "dataTag": "testrun1",
+    "setupDurationMs": 1985.08,
+    "createdChatCount": 5,
+    "createdMessageCount": 5,
+    "sampleChatIds": [
+      "chat_3400128b-1916-4351-ba2a-80897091aa96",
+      "chat_3400128b-1916-4351-ba2a-80897091aa96",
+      "chat_3400128b-1916-4351-ba2a-80897091aa96",
+      "chat_3400128b-1916-4351-ba2a-80897091aa96",
+      "chat_3400128b-1916-4351-ba2a-80897091aa96"
+    ]
+  },
+  "execution": {
+    "warmupIterations": 5,
+    "measurementIterations": 20
+  },
+  "summary": {
+    "totalRequests": 20,
+    "successCount": 20,
+    "errorCount": 0,
+    "errorRate": 0,
+    "minMs": 55.05,
+    "maxMs": 215.1,
+    "p50Ms": 83.24,
+    "p95Ms": 148.18,
+    "p99Ms": 215.1,
+    "failures": []
+  }
+}

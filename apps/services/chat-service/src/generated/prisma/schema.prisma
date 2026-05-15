@@ -1,0 +1,272 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("CHAT_DATABASE_URL")
+}
+
+enum ChatType {
+  direct
+  group
+  channel
+}
+
+enum ChatMemberRole {
+  owner
+  admin
+  member
+}
+
+// ❌ 'restricted' is NEVER a valid status — restriction is a JSONB overlay
+// ❌ 'subscriber' is NEVER a valid role — it is a derived participation type
+enum ChatMemberStatus {
+  active
+  invited
+  requested
+  banned
+  left
+  removed // legacy: kept for backward compat; treated as 'left' in permission engine
+}
+
+enum JoinMode {
+  open
+  approval_required
+  invite_only
+}
+
+enum HistoryVisibility {
+  visible_to_all
+  visible_from_join
+}
+
+enum JoinRequestStatus {
+  pending
+  approved
+  declined
+}
+
+enum OutboxEventStatus {
+  pending
+  published
+  failed
+}
+
+model Chat {
+  id              String   @id
+  type            ChatType
+  title           String?
+  description     String?
+  photoMediaId    String?  @map("photo_media_id")
+  createdByUserId String   @map("created_by_user_id")
+  isArchived      Boolean  @default(false) @map("is_archived")
+
+  // Phase 1 additions — group/channel semantics
+  joinMode           JoinMode          @default(open) @map("join_mode")
+  isPublic           Boolean           @default(false) @map("is_public")
+  historyVisibility  HistoryVisibility @default(visible_to_all) @map("history_visibility")
+  allowMemberInvites Boolean           @default(true) @map("allow_member_invites")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  members        ChatMember[]
+  permissions    ChatPermission?
+  inviteLinks    InviteLink[]
+  chatPins       ChatPin[]
+  chatMutes      ChatMute[]
+  joinRequests   JoinRequest[]
+  moderationLogs ModerationLog[]
+
+  @@index([type])
+  @@index([createdByUserId])
+  @@map("chats")
+}
+
+model ChatMember {
+  id              String           @id
+  chatId          String           @map("chat_id")
+  userId          String           @map("user_id")
+  role            ChatMemberRole
+  status          ChatMemberStatus
+  invitedByUserId String?          @map("invited_by_user_id")
+  joinedAt        DateTime?        @map("joined_at")
+  leftAt          DateTime?        @map("left_at")
+
+  // Admin configurable permissions (populated iff role=admin)
+  // See AdminPermissions interface in chat-permissions.ts
+  adminPermissions Json? @map("admin_permissions")
+
+  // Restriction overlay — NOT a status; only meaningful when status=active
+  // See MemberRestrictions interface in chat-permissions.ts
+  restriction        Json?     @map("restriction")
+  restrictionUntil   DateTime? @map("restriction_until")
+  restrictedByUserId String?   @map("restricted_by_user_id")
+  restrictedAt       DateTime? @map("restricted_at")
+
+  // Ban audit
+  bannedByUserId String?   @map("banned_by_user_id")
+  bannedAt       DateTime? @map("banned_at")
+  bannedReason   String?   @map("banned_reason")
+
+  // Promotion audit
+  promotedByUserId String?   @map("promoted_by_user_id")
+  promotedAt       DateTime? @map("promoted_at")
+
+  chat Chat @relation(fields: [chatId], references: [id])
+
+  @@unique([chatId, userId])
+  @@index([userId])
+  @@index([chatId, status])
+  @@index([restrictionUntil], map: "chat_members_restriction_until_idx")
+  @@map("chat_members")
+}
+
+model ChatPermission {
+  chatId          String   @id @map("chat_id")
+  canSendMessages Boolean  @default(true) @map("can_send_messages")
+  canAddMembers   Boolean  @default(true) @map("can_add_members")
+  canPinMessages  Boolean  @default(true) @map("can_pin_messages")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  chat            Chat     @relation(fields: [chatId], references: [id])
+
+  @@map("chat_permissions")
+}
+
+model InviteLink {
+  id              String    @id
+  chatId          String    @map("chat_id")
+  tokenHash       String    @unique @map("token_hash")
+  createdByUserId String    @map("created_by_user_id")
+  expiresAt       DateTime? @map("expires_at")
+  maxUses         Int?      @map("max_uses")
+  usedCount       Int       @default(0) @map("used_count")
+  revokedAt       DateTime? @map("revoked_at")
+
+  // Phase 1 additions
+  requiresApproval Boolean @default(false) @map("requires_approval")
+  isPrimary        Boolean @default(false) @map("is_primary")
+
+  createdAt    DateTime      @default(now()) @map("created_at")
+  chat         Chat          @relation(fields: [chatId], references: [id])
+  joinRequests JoinRequest[]
+
+  @@index([chatId])
+  @@map("invite_links")
+}
+
+model JoinRequest {
+  id               String            @id
+  chatId           String            @map("chat_id")
+  userId           String            @map("user_id")
+  inviteLinkId     String?           @map("invite_link_id")
+  status           JoinRequestStatus @default(pending)
+  reviewedByUserId String?           @map("reviewed_by_user_id")
+  reviewedAt       DateTime?         @map("reviewed_at")
+  createdAt        DateTime          @default(now()) @map("created_at")
+
+  chat       Chat        @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  inviteLink InviteLink? @relation(fields: [inviteLinkId], references: [id])
+
+  @@index([chatId, status])
+  @@index([userId])
+  @@map("join_requests")
+}
+
+model ModerationLog {
+  id                String   @id
+  chatId            String   @map("chat_id")
+  performedByUserId String   @map("performed_by_user_id")
+  targetUserId      String?  @map("target_user_id")
+  targetMessageId   String?  @map("target_message_id")
+  action            String
+  meta              Json?
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+  @@index([chatId, createdAt(sort: Desc)])
+  @@index([chatId, targetUserId])
+  @@map("moderation_log")
+}
+
+model ChatPin {
+  id       String   @id
+  chatId   String   @map("chat_id")
+  userId   String   @map("user_id")
+  pinnedAt DateTime @default(now()) @map("pinned_at")
+  chat     Chat     @relation(fields: [chatId], references: [id])
+
+  @@unique([chatId, userId])
+  @@index([userId, pinnedAt])
+  @@map("chat_pins")
+}
+
+model ChatMute {
+  id      String   @id
+  chatId  String   @map("chat_id")
+  userId  String   @map("user_id")
+  mutedAt DateTime @default(now()) @map("muted_at")
+  chat    Chat     @relation(fields: [chatId], references: [id])
+
+  @@unique([chatId, userId])
+  @@index([userId])
+  @@map("chat_mutes")
+}
+
+model OutboxEvent {
+  id           String            @id
+  eventType    String            @map("event_type")
+  eventVersion Int               @map("event_version")
+  aggregateId  String            @map("aggregate_id")
+  partitionKey String            @map("partition_key")
+  payloadJson  Json              @map("payload_json")
+  occurredAt   DateTime          @map("occurred_at")
+  publishedAt  DateTime?         @map("published_at")
+  status       OutboxEventStatus
+  attemptCount Int               @default(0) @map("attempt_count")
+  lastError    String?           @map("last_error")
+  lockedAt     DateTime?         @map("locked_at")
+  lockedBy     String?           @map("locked_by")
+
+  @@index([status, lockedAt, occurredAt])
+  @@index([lockedBy])
+  @@map("outbox_events")
+}
+
+model ChatMembershipProjection {
+  chatId    String           @map("chat_id")
+  userId    String           @map("user_id")
+  role      ChatMemberRole
+  status    ChatMemberStatus
+  updatedAt DateTime         @map("updated_at")
+
+  @@id([chatId, userId])
+  @@index([chatId, status])
+  @@index([userId, status])
+  @@map("chat_membership_projection")
+}
+
+model ChatMembershipProjectionEvent {
+  eventId     String   @id @map("event_id")
+  eventType   String   @map("event_type")
+  occurredAt  DateTime @map("occurred_at")
+  processedAt DateTime @default(now()) @map("processed_at")
+  chatId      String?  @map("chat_id")
+  userId      String?  @map("user_id")
+
+  @@index([occurredAt])
+  @@index([chatId, userId])
+  @@map("chat_membership_projection_events")
+}
+
+model ChatMembershipProjectionOffset {
+  consumer       String    @id
+  lastEventId    String?   @map("last_event_id")
+  lastOccurredAt DateTime? @map("last_occurred_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  @@map("chat_membership_projection_offsets")
+}

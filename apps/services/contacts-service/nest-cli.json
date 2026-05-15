@@ -1,0 +1,17 @@
+{
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "src",
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "entryFile": "main",
+  "compilerOptions": {
+    "deleteOutDir": true,
+    "tsConfigPath": "tsconfig.build.json",
+    "assets": [
+      {
+        "include": "src/generated/prisma/**/*",
+        "outDir": "dist/generated/prisma",
+        "watchAssets": true
+      }
+    ]
+  }
+}

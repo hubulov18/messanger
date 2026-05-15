@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("CONTACTS_DATABASE_URL")
+}
+
+enum OutboxEventStatus {
+  pending
+  published
+  failed
+}
+
+model ContactBook {
+  ownerUserId    String            @id @map("owner_user_id")
+  lastImportedAt DateTime?         @map("last_imported_at")
+  version        Int               @default(1)
+  importedContacts ImportedContact[]
+
+  @@map("contact_books")
+}
+
+model ImportedContact {
+  id             String      @id
+  ownerUserId    String      @map("owner_user_id")
+  normalizedHash String      @map("normalized_hash")
+  phoneNumber    String?     @map("phone_number")
+  displayName    String      @map("display_name")
+  matchedUserId  String?     @map("matched_user_id")
+  createdAt      DateTime    @default(now()) @map("created_at")
+  updatedAt      DateTime    @updatedAt @map("updated_at")
+  contactBook    ContactBook @relation(fields: [ownerUserId], references: [ownerUserId])
+
+  @@unique([ownerUserId, normalizedHash])
+  @@index([ownerUserId])
+  @@index([normalizedHash])
+  @@index([matchedUserId])
+  @@map("imported_contacts")
+}
+
+model OutboxEvent {
+  id           String           @id
+  eventType    String           @map("event_type")
+  eventVersion Int              @map("event_version")
+  aggregateId  String           @map("aggregate_id")
+  partitionKey String           @map("partition_key")
+  payloadJson  Json             @map("payload_json")
+  occurredAt   DateTime         @map("occurred_at")
+  publishedAt  DateTime?        @map("published_at")
+  status       OutboxEventStatus
+  attemptCount Int              @default(0) @map("attempt_count")
+  lastError    String?          @map("last_error")
+  lockedAt     DateTime?        @map("locked_at")
+  lockedBy     String?          @map("locked_by")
+
+  @@index([status, lockedAt, occurredAt])
+  @@index([lockedBy])
+  @@map("outbox_events")
+}

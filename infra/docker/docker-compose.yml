@@ -1,0 +1,443 @@
+name: telegram-local
+
+x-backend-service: &backend-service
+  build:
+    context: ../..
+    dockerfile: infra/docker/backend.Dockerfile
+  restart: unless-stopped
+  networks:
+    - telegram
+  depends_on:
+    postgres:
+      condition: service_healthy
+    rabbitmq:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+    minio:
+      condition: service_started
+  environment:
+    NODE_ENV: development
+    JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-development-access-secret}
+    RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+    RABBITMQ_EXCHANGE: telegram.events
+    OUTBOX_POLL_INTERVAL_MS: 2000
+    OUTBOX_BATCH_SIZE: 50
+    OUTBOX_LOCK_TIMEOUT_MS: 30000
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: telegram-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: postgres
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - telegram
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: telegram-rabbitmq
+    restart: unless-stopped
+    ports:
+      - "${RABBITMQ_AMQP_PORT:-5672}:5672"
+      - "${RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    networks:
+      - telegram
+
+  redis:
+    image: redis:7-alpine
+    container_name: telegram-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks:
+      - telegram
+
+  minio:
+    image: minio/minio:RELEASE.2025-02-28T09-55-16Z
+    container_name: telegram-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minio}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    ports:
+      - "${MINIO_API_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - telegram
+
+  minio-bootstrap:
+    image: minio/mc:RELEASE.2025-02-21T16-00-46Z
+    container_name: telegram-minio-bootstrap
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c '
+      until mc alias set local http://minio:9000 ${MINIO_ROOT_USER:-minio} ${MINIO_ROOT_PASSWORD:-minioadmin}; do sleep 2; done;
+      mc mb --ignore-existing local/${MINIO_DEFAULT_BUCKET:-telegram-media};
+      mc anonymous set private local/${MINIO_DEFAULT_BUCKET:-telegram-media};
+      '
+    restart: "no"
+    networks:
+      - telegram
+
+  coturn:
+    image: coturn/coturn
+    container_name: telegram-coturn
+    restart: unless-stopped
+    command:
+      - -n
+      - --log-file=stdout
+      - --realm=telegram.local
+      - --listening-port=3478
+      - --listening-ip=0.0.0.0
+      - --verbose
+      - --min-port=49152
+      - --max-port=49200
+      - --lt-cred-mech
+      - --use-auth-secret
+      - --static-auth-secret=${TURN_SHARED_SECRET:-development-turn-secret}
+      - --external-ip=${TURN_EXTERNAL_HOST:-10.12.242.151}
+    ports:
+      - "3478:3478/tcp"
+      - "3478:3478/udp"
+      - "49152-49200:49152-49200/udp"
+    networks:
+      - telegram
+
+  identity-service:
+    <<: *backend-service
+    container_name: telegram-identity-service
+    command: >
+      sh -lc "npm exec --workspace=@telegram/identity-service prisma migrate deploy && node apps/services/identity-service/dist/main.js"
+    environment:
+      PORT: 3001
+      IDENTITY_DATABASE_URL: postgresql://postgres:postgres@postgres:5432/telegram_identity
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-development-access-secret}
+      JWT_ACCESS_TTL_SECONDS: 900
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      RABBITMQ_EXCHANGE: telegram.events
+      OUTBOX_POLL_INTERVAL_MS: 2000
+      OUTBOX_BATCH_SIZE: 50
+      OUTBOX_LOCK_TIMEOUT_MS: 30000
+    ports:
+      - "3001:3001"
+
+  profile-service:
+    <<: *backend-service
+    container_name: telegram-profile-service
+    command: >
+      sh -lc "npm exec --workspace=@telegram/profile-service prisma migrate deploy && node apps/services/profile-service/dist/main.js"
+    environment:
+      PORT: 3004
+      PROFILE_DATABASE_URL: postgresql://postgres:postgres@postgres:5432/telegram_profile?schema=public
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-development-access-secret}
+      IDENTITY_SERVICE_URL: http://identity-service:3001
+      CONTACTS_SERVICE_URL: http://contacts-service:3005
+      CHAT_SERVICE_URL: http://chat-service:3002
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      RABBITMQ_EXCHANGE: telegram.events
+      OUTBOX_POLL_INTERVAL_MS: 2000
+      OUTBOX_BATCH_SIZE: 50
+      OUTBOX_LOCK_TIMEOUT_MS: 30000
+    ports:
+      - "3004:3004"
+
+  chat-service:
+    <<: *backend-service
+    container_name: telegram-chat-service
+    command: >
+      sh -lc "npm exec --workspace=@telegram/chat-service prisma migrate deploy && node apps/services/chat-service/dist/main.js"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_started
+      profile-service:
+        condition: service_started
+    environment:
+      PORT: 3002
+      CHAT_DATABASE_URL: postgresql://postgres:postgres@postgres:5432/telegram_chat
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-development-access-secret}
+      PROFILE_SERVICE_URL: http://profile-service:3004
+      MESSAGE_SERVICE_URL: http://message-service:3003
+      CHAT_SUMMARY_PROJECTION_SHADOW_READ_ENABLED: "true"
+      CHAT_SUMMARY_PROJECTION_READ_ENABLED: "true"
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      RABBITMQ_EXCHANGE: telegram.events
+      OUTBOX_POLL_INTERVAL_MS: 2000
+      OUTBOX_BATCH_SIZE: 50
+      OUTBOX_LOCK_TIMEOUT_MS: 30000
+    ports:
+      - "3002:3002"
+
+  message-service:
+    <<: *backend-service
+    container_name: telegram-message-service
+    command: >
+      sh -lc "npm exec --workspace=@telegram/message-service prisma migrate deploy && node apps/services/message-service/dist/main.js"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_started
+      chat-service:
+        condition: service_started
+      profile-service:
+        condition: service_started
+    environment:
+      PORT: 3003
+      MESSAGE_DATABASE_URL: postgresql://postgres:postgres@postgres:5432/telegram_message
+      CHAT_SERVICE_URL: http://chat-service:3002
+      PROFILE_SERVICE_URL: http://profile-service:3004
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-development-access-secret}
+      CHAT_SUMMARY_PROJECTION_POLL_INTERVAL_MS: 2000
+      CHAT_SUMMARY_PROJECTION_BATCH_SIZE: 100
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      RABBITMQ_EXCHANGE: telegram.events
+      OUTBOX_POLL_INTERVAL_MS: 2000
+      OUTBOX_BATCH_SIZE: 50
+      OUTBOX_LOCK_TIMEOUT_MS: 30000
+    ports:
+      - "3003:3003"
+
+  contacts-service:
+    <<: *backend-service
+    container_name: telegram-contacts-service
+    command: >
+      sh -lc "npm exec --workspace=@telegram/contacts-service prisma migrate deploy && node apps/services/contacts-service/dist/main.js"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_started
+      identity-service:
+        condition: service_started
+      profile-service:
+        condition: service_started
+    environment:
+      PORT: 3005
+      CONTACTS_DATABASE_URL: postgresql://postgres:postgres@postgres:5432/telegram_contacts
+      IDENTITY_SERVICE_URL: http://identity-service:3001
+      PROFILE_SERVICE_URL: http://profile-service:3004
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-development-access-secret}
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      RABBITMQ_EXCHANGE: telegram.events
+      OUTBOX_POLL_INTERVAL_MS: 2000
+      OUTBOX_BATCH_SIZE: 50
+      OUTBOX_LOCK_TIMEOUT_MS: 30000
+    ports:
+      - "3005:3005"
+
+
+  media-service:
+    <<: *backend-service
+    container_name: telegram-media-service
+    command: >
+      sh -lc "npm exec --workspace=@telegram/media-service prisma generate &&
+      node scripts/build/copy-prisma-generated.mjs apps/services/media-service &&
+      npm exec --workspace=@telegram/media-service prisma migrate deploy &&
+      node apps/services/media-service/dist/main.js"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_started
+      profile-service:
+        condition: service_started
+    environment:
+      PORT: 3006
+      MEDIA_DATABASE_URL: postgresql://postgres:postgres@postgres:5432/telegram_media
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-development-access-secret}
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      RABBITMQ_EXCHANGE: telegram.events
+      OUTBOX_POLL_INTERVAL_MS: 2000
+      OUTBOX_BATCH_SIZE: 50
+      OUTBOX_LOCK_TIMEOUT_MS: 30000
+      MEDIA_UPLOAD_URL_TTL_SECONDS: 900
+      MEDIA_PUBLIC_BASE_URL:
+      MESSAGE_SERVICE_URL: http://message-service:3003
+      PROFILE_SERVICE_URL: http://profile-service:3004
+      STORAGE_S3_ENDPOINT: http://minio:9000
+      STORAGE_S3_PUBLIC_ENDPOINT: http://${LOCAL_DEV_HOST:-10.12.242.151}:9000
+      STORAGE_S3_BUCKET: ${MINIO_DEFAULT_BUCKET:-telegram-media}
+      STORAGE_S3_REGION: us-east-1
+      STORAGE_S3_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-minio}
+      STORAGE_S3_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      STORAGE_S3_FORCE_PATH_STYLE: "true"
+    ports:
+      - "3006:3006"
+
+  notification-service:
+    <<: *backend-service
+    container_name: telegram-notification-service
+    command: >
+      sh -lc "npm exec --workspace=@telegram/notification-service prisma migrate deploy && node apps/services/notification-service/dist/main.js"
+    environment:
+      PORT: 3008
+      CALLS_V1_ENABLED: "true"
+      NOTIFICATION_DATABASE_URL: postgresql://postgres:postgres@postgres:5432/telegram_notification
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-development-access-secret}
+      VOIP_PROVIDER_MODE: ${VOIP_PROVIDER_MODE:-dry_run}
+      VOIP_APNS_TOPIC: ${VOIP_APNS_TOPIC:-com.judyannmartos.mobileiosshell.voip}
+      VOIP_APNS_KEY_ID: ${VOIP_APNS_KEY_ID:-}
+      VOIP_APNS_TEAM_ID: ${VOIP_APNS_TEAM_ID:-}
+      VOIP_APNS_AUTH_KEY: ${VOIP_APNS_AUTH_KEY:-}
+      VOIP_APNS_AUTH_KEY_PATH: ${VOIP_APNS_AUTH_KEY_PATH:-}
+      VOIP_APNS_USE_SANDBOX: ${VOIP_APNS_USE_SANDBOX:-true}
+      PUSH_PROVIDER_MODE: ${PUSH_PROVIDER_MODE:-dry_run}
+      PUSH_APNS_TOPIC: ${PUSH_APNS_TOPIC:-com.judyannmartos.mobileiosshell}
+      PUSH_APNS_KEY_ID: ${PUSH_APNS_KEY_ID:-}
+      PUSH_APNS_TEAM_ID: ${PUSH_APNS_TEAM_ID:-}
+      PUSH_APNS_AUTH_KEY: ${PUSH_APNS_AUTH_KEY:-}
+      PUSH_APNS_AUTH_KEY_PATH: ${PUSH_APNS_AUTH_KEY_PATH:-}
+      PUSH_APNS_USE_SANDBOX: ${PUSH_APNS_USE_SANDBOX:-true}
+      FCM_PROVIDER_MODE: ${FCM_PROVIDER_MODE:-disabled}
+      FCM_SERVICE_ACCOUNT_JSON: ${FCM_SERVICE_ACCOUNT_JSON:-}
+      FCM_SERVICE_ACCOUNT_PATH: ${FCM_SERVICE_ACCOUNT_PATH:-}
+    ports:
+      - "3008:3008"
+
+  call-service:
+    <<: *backend-service
+    container_name: telegram-call-service
+    command: >
+      sh -lc "npm exec --workspace=@telegram/call-service prisma migrate deploy && node apps/services/call-service/dist/main.js"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      chat-service:
+        condition: service_started
+      profile-service:
+        condition: service_started
+      message-service:
+        condition: service_started
+      notification-service:
+        condition: service_started
+      coturn:
+        condition: service_started
+    environment:
+      PORT: 3007
+      CALLS_V1_ENABLED: "true"
+      CALL_DATABASE_URL: postgresql://postgres:postgres@postgres:5432/telegram_call
+      CHAT_SERVICE_URL: http://chat-service:3002
+      PROFILE_SERVICE_URL: http://profile-service:3004
+      MESSAGE_SERVICE_URL: http://message-service:3003
+      NOTIFICATION_SERVICE_URL: http://notification-service:3008
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-development-access-secret}
+      REDIS_URL: redis://redis:6379
+      CALL_SIGNALING_PUBLIC_URL: http://${LOCAL_DEV_HOST:-10.12.242.151}:3007/calls
+      CALL_SIGNALING_TOKEN_TTL_SECONDS: 60
+      CALL_RING_TIMEOUT_MS: 30000
+      CALL_STUN_URL: stun:${TURN_EXTERNAL_HOST:-10.12.242.151}:3478
+      CALL_TURN_URL: turn:${TURN_EXTERNAL_HOST:-10.12.242.151}:3478?transport=udp,turn:${LOCAL_DEV_HOST:-10.12.242.151}:3478?transport=udp
+      CALL_TURN_SHARED_SECRET: ${TURN_SHARED_SECRET:-development-turn-secret}
+      CALL_TURN_REALM: telegram.local
+      CALL_TURN_CREDENTIAL_TTL_SECONDS: 3600
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      RABBITMQ_EXCHANGE: telegram.events
+      OUTBOX_POLL_INTERVAL_MS: 2000
+      OUTBOX_BATCH_SIZE: 50
+      OUTBOX_LOCK_TIMEOUT_MS: 30000
+    ports:
+      - "3007:3007"
+
+  api-gateway:
+    <<: *backend-service
+    container_name: telegram-api-gateway
+    command: node apps/api-gateway/dist/main.js
+    depends_on:
+      identity-service:
+        condition: service_started
+      profile-service:
+        condition: service_started
+      chat-service:
+        condition: service_started
+      message-service:
+        condition: service_started
+      notification-service:
+        condition: service_started
+      call-service:
+        condition: service_started
+      contacts-service:
+        condition: service_started
+      media-service:
+        condition: service_started
+    environment:
+      PORT: 3000
+      CALLS_V1_ENABLED: "true"
+      JWT_ACCESS_SECRET: development-access-secret
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      RABBITMQ_EXCHANGE: telegram.events
+      IDENTITY_SERVICE_URL: http://identity-service:3001
+      PROFILE_SERVICE_URL: http://profile-service:3004
+      CHAT_SERVICE_URL: http://chat-service:3002
+      MESSAGE_SERVICE_URL: http://message-service:3003
+      NOTIFICATION_SERVICE_URL: http://notification-service:3008
+      CALL_SERVICE_URL: http://call-service:3007
+      CONTACTS_SERVICE_URL: http://contacts-service:3005
+      MEDIA_SERVICE_URL: http://media-service:3006
+      UPSTREAM_TIMEOUT_MS: 25000
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres_data:
+  rabbitmq_data:
+  redis_data:
+  minio_data:
+
+networks:
+  telegram:
+    driver: bridge

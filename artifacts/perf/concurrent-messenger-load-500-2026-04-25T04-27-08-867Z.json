@@ -1,0 +1,302 @@
+{
+  "startedAt": "2026-04-25T04:27:00.060Z",
+  "finishedAt": "2026-04-25T04:27:08.865Z",
+  "baseUrl": "http://localhost:3000/v1",
+  "setup": {
+    "gatewayHealth": {
+      "ok": false,
+      "status": 404,
+      "body": {
+        "error": {
+          "code": "NOT_FOUND",
+          "message": "Cannot GET /health",
+          "details": "Cannot GET /health",
+          "requestId": "req_6eed8401-ffc4-4c12-8bc5-56ebb2708f44"
+        }
+      }
+    },
+    "userCount": 500,
+    "chatCount": 250,
+    "setupConcurrency": 10,
+    "dataTag": "grouped-unread-selects-500",
+    "chatListLimit": 20,
+    "messageListLimit": 20,
+    "sampleUsers": [
+      {
+        "userId": "user_d734c683-5d0b-4811-ba99-830e114f6b35",
+        "phoneNumber": "+14158958912",
+        "chatId": "chat_36d24675-8043-4b99-bb05-e2dbc1dc714d",
+        "peerUserId": "user_18016437-5a9c-467b-ab27-c2f6497093cd"
+      },
+      {
+        "userId": "user_18016437-5a9c-467b-ab27-c2f6497093cd",
+        "phoneNumber": "+14159958912",
+        "chatId": "chat_36d24675-8043-4b99-bb05-e2dbc1dc714d",
+        "peerUserId": "user_d734c683-5d0b-4811-ba99-830e114f6b35"
+      },
+      {
+        "userId": "user_2552482b-8058-4be8-a36c-9143573deea2",
+        "phoneNumber": "+14152958913",
+        "chatId": "chat_1f9ccab9-431c-43b3-86dd-17aaf0c4e09d",
+        "peerUserId": "user_ee2368c8-cfdb-48d1-b083-c654d93f0b92"
+      },
+      {
+        "userId": "user_ee2368c8-cfdb-48d1-b083-c654d93f0b92",
+        "phoneNumber": "+14153958913",
+        "chatId": "chat_1f9ccab9-431c-43b3-86dd-17aaf0c4e09d",
+        "peerUserId": "user_2552482b-8058-4be8-a36c-9143573deea2"
+      },
+      {
+        "userId": "user_8315234f-44c1-4d06-9a62-7b288a4b5349",
+        "phoneNumber": "+14154958913",
+        "chatId": "chat_eacce322-c4b0-4442-94e0-992ef2a088bc",
+        "peerUserId": "user_f686e9bd-61a3-43b9-84cc-97666e38dbcc"
+      }
+    ],
+    "sampleChats": [
+      {
+        "chatId": "chat_36d24675-8043-4b99-bb05-e2dbc1dc714d",
+        "leftUserId": "user_d734c683-5d0b-4811-ba99-830e114f6b35",
+        "rightUserId": "user_18016437-5a9c-467b-ab27-c2f6497093cd"
+      },
+      {
+        "chatId": "chat_1f9ccab9-431c-43b3-86dd-17aaf0c4e09d",
+        "leftUserId": "user_2552482b-8058-4be8-a36c-9143573deea2",
+        "rightUserId": "user_ee2368c8-cfdb-48d1-b083-c654d93f0b92"
+      },
+      {
+        "chatId": "chat_eacce322-c4b0-4442-94e0-992ef2a088bc",
+        "leftUserId": "user_8315234f-44c1-4d06-9a62-7b288a4b5349",
+        "rightUserId": "user_f686e9bd-61a3-43b9-84cc-97666e38dbcc"
+      },
+      {
+        "chatId": "chat_6dbadbfa-5f2a-45aa-b1be-dffb2438a3c7",
+        "leftUserId": "user_64fea8f6-8394-4273-92d9-2fca20512f63",
+        "rightUserId": "user_bb2dcb1c-02a2-4d14-bc34-baf9920bc8c6"
+      },
+      {
+        "chatId": "chat_7f727871-bb7f-4e4a-aa54-7d3adcb99180",
+        "leftUserId": "user_5685bd70-b1c3-455f-ae15-b42c4b38dc41",
+        "rightUserId": "user_82f9a06e-d078-4575-b17d-f45fe25b86d7"
+      }
+    ]
+  },
+  "summary": {
+    "scenario": {
+      "totalRequests": 500,
+      "successCount": 0,
+      "errorCount": 500,
+      "errorRate": 1,
+      "minMs": 643.85,
+      "maxMs": 3126.9,
+      "p50Ms": 2551.06,
+      "p95Ms": 3111.03,
+      "p99Ms": 3124.43,
+      "failures": [
+        {
+          "status": null,
+          "durationMs": 643.85,
+          "error": {
+            "error": {
+              "code": "UNAUTHENTICATED",
+              "message": "Invalid access token",
+              "requestId": "req_12f0927d-4bee-435c-bc79-f98693946907"
+            }
+          }
+        },
+        {
+          "status": null,
+          "durationMs": 644.02,
+          "error": {
+            "error": {
+              "code": "UNAUTHENTICATED",
+              "message": "Invalid access token",
+              "requestId": "req_58cac370-db12-40f2-8560-07e7e66f9f8f"
+            }
+          }
+        },
+        {
+          "status": null,
+          "durationMs": 644.78,
+          "error": {
+            "error": {
+              "code": "UNAUTHENTICATED",
+              "message": "Invalid access token",
+              "requestId": "req_5f7f963f-cc20-43fd-8567-eb6fb246f451"
+            }
+          }
+        },
+        {
+          "status": null,
+          "durationMs": 645.52,
+          "error": {
+            "error": {
+              "code": "UNAUTHENTICATED",
+              "message": "Invalid access token",
+              "requestId": "req_92cf3836-27b5-44c0-92f0-2071b86f7031"
+            }
+          }
+        },
+        {
+          "status": null,
+          "durationMs": 646.22,
+          "error": {
+            "error": {
+              "code": "UNAUTHENTICATED",
+              "message": "Invalid access token",
+              "requestId": "req_a9df385d-b428-42b5-91d1-5b515f3f8c1c"
+            }
+          }
+        }
+      ]
+    },
+    "getChats": {
+      "totalRequests": 500,
+      "successCount": 500,
+      "errorCount": 0,
+      "errorRate": 0,
+      "minMs": 238.16,
+      "maxMs": 2776.27,
+      "p50Ms": 2133.04,
+      "p95Ms": 2760.12,
+      "p99Ms": 2767.28,
+      "failures": []
+    },
+    "getMessages": {
+      "totalRequests": 500,
+      "successCount": 0,
+      "errorCount": 500,
+      "errorRate": 1,
+      "minMs": 3.33,
+      "maxMs": 539.24,
+      "p50Ms": 187.6,
+      "p95Ms": 343.09,
+      "p99Ms": 406.9,
+      "failures": [
+        {
+          "status": 401,
+          "durationMs": 320.75,
+          "error": {
+            "error": {
+              "code": "UNAUTHENTICATED",
+              "message": "Invalid access token",
+              "requestId": "req_12f0927d-4bee-435c-bc79-f98693946907"
+            }
+          }
+        },
+        {
+          "status": 401,
+          "durationMs": 201.27,
+          "error": {
+            "error": {
+              "code": "UNAUTHENTICATED",
+              "message": "Invalid access token",
+              "requestId": "req_58cac370-db12-40f2-8560-07e7e66f9f8f"
+            }
+          }
+        },
+        {
+          "status": 401,
+          "durationMs": 195.9,
+          "error": {
+            "error": {
+              "code": "UNAUTHENTICATED",
+              "message": "Invalid access token",
+              "requestId": "req_5f7f963f-cc20-43fd-8567-eb6fb246f451"
+            }
+          }
+        },
+        {
+          "status": 401,
+          "durationMs": 197.99,
+          "error": {
+            "error": {
+              "code": "UNAUTHENTICATED",
+              "message": "Invalid access token",
+              "requestId": "req_92cf3836-27b5-44c0-92f0-2071b86f7031"
+            }
+          }
+        },
+        {
+          "status": 401,
+          "durationMs": 202.45,
+          "error": {
+            "error": {
+              "code": "UNAUTHENTICATED",
+              "message": "Invalid access token",
+              "requestId": "req_a9df385d-b428-42b5-91d1-5b515f3f8c1c"
+            }
+          }
+        }
+      ]
+    },
+    "postMessages": {
+      "totalRequests": 500,
+      "successCount": 0,
+      "errorCount": 500,
+      "errorRate": 1,
+      "minMs": 6.08,
+      "maxMs": 397.48,
+      "p50Ms": 127.96,
+      "p95Ms": 246.7,
+      "p99Ms": 342.41,
+      "failures": [
+        {
+          "status": 401,
+          "durationMs": 83.87,
+          "error": {
+            "error": {
+              "code": "UNAUTHENTICATED",
+              "message": "Invalid access token",
+              "requestId": "req_405f1d6f-ffd9-476b-9adc-1f31649978ae"
+            }
+          }
+        },
+        {
+          "status": 401,
+          "durationMs": 29.51,
+          "error": {
+            "error": {
+              "code": "UNAUTHENTICATED",
+              "message": "Invalid access token",
+              "requestId": "req_44362130-3718-4101-82a2-fdc1eb074a6b"
+            }
+          }
+        },
+        {
+          "status": 401,
+          "durationMs": 23.84,
+          "error": {
+            "error": {
+              "code": "UNAUTHENTICATED",
+              "message": "Invalid access token",
+              "requestId": "req_cc3682e3-4c4e-401f-b748-50ff5ed1fc90"
+            }
+          }
+        },
+        {
+          "status": 401,
+          "durationMs": 23.25,
+          "error": {
+            "error": {
+              "code": "UNAUTHENTICATED",
+              "message": "Invalid access token",
+              "requestId": "req_74e41567-5305-4e6e-86e6-a300ca3c5760"
+            }
+          }
+        },
+        {
+          "status": 401,
+          "durationMs": 15.82,
+          "error": {
+            "error": {
+              "code": "UNAUTHENTICATED",
+              "message": "Invalid access token",
+              "requestId": "req_e1856bea-13ea-45db-a878-ceb17bf292eb"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,111 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("CALL_DATABASE_URL")
+}
+
+enum CallState {
+  initiated
+  ringing
+  accepted
+  active
+  ended
+  declined
+  missed
+  canceled
+  failed
+}
+
+enum CallParticipantRole {
+  caller
+  callee
+}
+
+enum CallParticipantState {
+  invited
+  ringing
+  joined
+  accepted
+  active
+  left
+  declined
+  missed
+  ended
+  failed
+}
+
+enum CallType {
+  audio
+  video
+}
+
+enum OutboxEventStatus {
+  pending
+  published
+  failed
+}
+
+model CallSession {
+  id                String               @id
+  chatId            String               @map("chat_id")
+  initiatorUserId   String               @map("initiator_user_id")
+  receiverUserId    String               @map("receiver_user_id")
+  callType          CallType             @default(audio) @map("call_type")
+  state             CallState
+  startedAt         DateTime             @map("started_at")
+  ringingAt         DateTime?            @map("ringing_at")
+  acceptedAt        DateTime?            @map("accepted_at")
+  activeAt          DateTime?            @map("active_at")
+  endedAt           DateTime?            @map("ended_at")
+  endReason         String?              @map("end_reason")
+  timelineMessageId String?              @map("timeline_message_id")
+  createdAt         DateTime             @default(now()) @map("created_at")
+  updatedAt         DateTime             @updatedAt @map("updated_at")
+  participants      CallParticipant[]
+
+  @@index([chatId, createdAt(sort: Desc)])
+  @@index([initiatorUserId, state])
+  @@index([receiverUserId, state])
+  @@map("call_sessions")
+}
+
+model CallParticipant {
+  id        String               @id
+  callId    String               @map("call_id")
+  userId    String               @map("user_id")
+  role      CallParticipantRole
+  state     CallParticipantState
+  joinedAt  DateTime?            @map("joined_at")
+  leftAt    DateTime?            @map("left_at")
+  createdAt DateTime             @default(now()) @map("created_at")
+  updatedAt DateTime             @updatedAt @map("updated_at")
+  call      CallSession          @relation(fields: [callId], references: [id])
+
+  @@unique([callId, userId])
+  @@index([userId, state])
+  @@map("call_participants")
+}
+
+model OutboxEvent {
+  id           String            @id
+  eventType    String            @map("event_type")
+  eventVersion Int               @map("event_version")
+  aggregateId  String            @map("aggregate_id")
+  partitionKey String            @map("partition_key")
+  payloadJson  Json              @map("payload_json")
+  occurredAt   DateTime          @map("occurred_at")
+  publishedAt  DateTime?         @map("published_at")
+  status       OutboxEventStatus
+  attemptCount Int               @default(0) @map("attempt_count")
+  lastError    String?           @map("last_error")
+  lockedAt     DateTime?         @map("locked_at")
+  lockedBy     String?           @map("locked_by")
+
+  @@index([status, lockedAt, occurredAt])
+  @@index([lockedBy])
+  @@map("outbox_events")
+}

@@ -1,0 +1,29 @@
+{
+  "name": "telegram-messenger",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "npm@10.9.0",
+  "workspaces": [
+    "apps/*",
+    "apps/services/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck",
+    "format": "turbo run format",
+    "seed:contact-flow": "node scripts/e2e/seed-contact-flow.mjs",
+    "smoke:contact-flow": "node scripts/e2e/run-contact-flow.mjs",
+    "smoke:chat-message-flow": "node scripts/e2e/run-chat-message-flow.mjs",
+    "perf:smoke:backend": "node scripts/perf/run-backend-baseline.mjs",
+    "perf:smoke:chats-growth": "node scripts/perf/run-chats-growth-smoke.mjs",
+    "perf:load:messenger": "node scripts/perf/run-concurrent-messenger-load.mjs"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.14",
+    "typescript": "^5.8.3"
+  }
+}

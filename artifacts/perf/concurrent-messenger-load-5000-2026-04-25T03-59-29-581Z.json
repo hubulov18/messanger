@@ -1,0 +1,268 @@
+{
+  "startedAt": "2026-04-25T03:56:26.124Z",
+  "finishedAt": "2026-04-25T03:59:29.377Z",
+  "baseUrl": "http://localhost:3000/v1",
+  "setup": {
+    "gatewayHealth": {
+      "ok": false,
+      "status": 404,
+      "body": {
+        "error": {
+          "code": "NOT_FOUND",
+          "message": "Cannot GET /health",
+          "details": "Cannot GET /health",
+          "requestId": "req_bda8d902-4ac6-48e3-a9cd-acfc886403b2"
+        }
+      }
+    },
+    "userCount": 5000,
+    "chatCount": 2500,
+    "setupConcurrency": 50,
+    "dataTag": "postopt5000",
+    "chatListLimit": 20,
+    "messageListLimit": 20,
+    "sampleUsers": [
+      {
+        "userId": "user_a5b3b225-b35b-4cd7-a9a4-e02ab513595b",
+        "phoneNumber": "+14156931844",
+        "chatId": "chat_d8b17d21-2d42-4565-bfe0-941bc386e892",
+        "peerUserId": "user_f1d1f52b-69a4-4b68-a839-fb8b928d0e61"
+      },
+      {
+        "userId": "user_f1d1f52b-69a4-4b68-a839-fb8b928d0e61",
+        "phoneNumber": "+14157931844",
+        "chatId": "chat_d8b17d21-2d42-4565-bfe0-941bc386e892",
+        "peerUserId": "user_a5b3b225-b35b-4cd7-a9a4-e02ab513595b"
+      },
+      {
+        "userId": "user_1a3a49ad-54b8-44e9-a344-e7c983c1e217",
+        "phoneNumber": "+14158931844",
+        "chatId": "chat_7211ef1a-741c-4c43-8d95-f2c7be57bbd4",
+        "peerUserId": "user_b5aae149-0393-4f7b-8a2e-6bea7a808afa"
+      },
+      {
+        "userId": "user_b5aae149-0393-4f7b-8a2e-6bea7a808afa",
+        "phoneNumber": "+14159931844",
+        "chatId": "chat_7211ef1a-741c-4c43-8d95-f2c7be57bbd4",
+        "peerUserId": "user_1a3a49ad-54b8-44e9-a344-e7c983c1e217"
+      },
+      {
+        "userId": "user_537cd188-2111-455f-8013-a637e665d702",
+        "phoneNumber": "+14152931845",
+        "chatId": "chat_dab80227-c57e-40d8-a3e2-ce71a370cc04",
+        "peerUserId": "user_bd753154-686b-425d-ba9b-e143c10cab70"
+      }
+    ],
+    "sampleChats": [
+      {
+        "chatId": "chat_d8b17d21-2d42-4565-bfe0-941bc386e892",
+        "leftUserId": "user_a5b3b225-b35b-4cd7-a9a4-e02ab513595b",
+        "rightUserId": "user_f1d1f52b-69a4-4b68-a839-fb8b928d0e61"
+      },
+      {
+        "chatId": "chat_7211ef1a-741c-4c43-8d95-f2c7be57bbd4",
+        "leftUserId": "user_1a3a49ad-54b8-44e9-a344-e7c983c1e217",
+        "rightUserId": "user_b5aae149-0393-4f7b-8a2e-6bea7a808afa"
+      },
+      {
+        "chatId": "chat_dab80227-c57e-40d8-a3e2-ce71a370cc04",
+        "leftUserId": "user_537cd188-2111-455f-8013-a637e665d702",
+        "rightUserId": "user_bd753154-686b-425d-ba9b-e143c10cab70"
+      },
+      {
+        "chatId": "chat_6223c825-1bc7-4a81-956f-d7539fe2f3cd",
+        "leftUserId": "user_a547a163-4e9d-43cf-b016-b43c920886fc",
+        "rightUserId": "user_97adeb2f-8fe3-413b-be23-73763fc0bca2"
+      },
+      {
+        "chatId": "chat_4ca33567-2ac2-451d-b7d3-f4862c8433e9",
+        "leftUserId": "user_68f97d58-4021-4b1b-86ca-13a1094fcbba",
+        "rightUserId": "user_2a9954cc-99f9-4155-9979-703d624d7cc7"
+      }
+    ]
+  },
+  "summary": {
+    "scenario": {
+      "totalRequests": 5000,
+      "successCount": 1,
+      "errorCount": 4999,
+      "errorRate": 0.9998,
+      "minMs": 10605.5,
+      "maxMs": 110986.93,
+      "p50Ms": 99609.9,
+      "p95Ms": 109121.52,
+      "p99Ms": 110288.42,
+      "failures": [
+        {
+          "status": null,
+          "durationMs": 63531.6,
+          "error": "fetch failed"
+        },
+        {
+          "status": null,
+          "durationMs": 63618.18,
+          "error": "fetch failed"
+        },
+        {
+          "status": null,
+          "durationMs": 63503.19,
+          "error": "fetch failed"
+        },
+        {
+          "status": null,
+          "durationMs": 63502.51,
+          "error": "fetch failed"
+        },
+        {
+          "status": null,
+          "durationMs": 63495.18,
+          "error": "fetch failed"
+        }
+      ]
+    },
+    "getChats": {
+      "totalRequests": 5000,
+      "successCount": 64,
+      "errorCount": 4936,
+      "errorRate": 0.9872,
+      "minMs": 3846.07,
+      "maxMs": 50711.57,
+      "p50Ms": 29784.96,
+      "p95Ms": 46798.92,
+      "p99Ms": 49293.44,
+      "failures": [
+        {
+          "status": null,
+          "durationMs": 11489.35,
+          "error": "fetch failed"
+        },
+        {
+          "status": null,
+          "durationMs": 11493.85,
+          "error": "fetch failed"
+        },
+        {
+          "status": null,
+          "durationMs": 11518.37,
+          "error": "fetch failed"
+        },
+        {
+          "status": null,
+          "durationMs": 11529.46,
+          "error": "fetch failed"
+        },
+        {
+          "status": null,
+          "durationMs": 11509.28,
+          "error": "fetch failed"
+        }
+      ]
+    },
+    "getMessages": {
+      "totalRequests": 5000,
+      "successCount": 85,
+      "errorCount": 4915,
+      "errorRate": 0.983,
+      "minMs": 2360.18,
+      "maxMs": 52417.96,
+      "p50Ms": 43414.88,
+      "p95Ms": 51988.23,
+      "p99Ms": 52227.45,
+      "failures": [
+        {
+          "status": 500,
+          "durationMs": 46828.54,
+          "error": {
+            "error": {
+              "code": "BAD_GATEWAY",
+              "message": "Internal server error",
+              "requestId": "req_fe0134e2-882d-4c03-940a-920567c31c71"
+            }
+          }
+        },
+        {
+          "status": 500,
+          "durationMs": 46824.95,
+          "error": {
+            "error": {
+              "code": "BAD_GATEWAY",
+              "message": "Internal server error",
+              "requestId": "req_73a16467-8912-4455-94d9-5e4a3f202e73"
+            }
+          }
+        },
+        {
+          "status": 500,
+          "durationMs": 46831.12,
+          "error": {
+            "error": {
+              "code": "BAD_GATEWAY",
+              "message": "Internal server error",
+              "requestId": "req_51ad05e9-23bc-4ba8-8f86-ea14eed1f0cb"
+            }
+          }
+        },
+        {
+          "status": 500,
+          "durationMs": 46769.49,
+          "error": {
+            "error": {
+              "code": "BAD_GATEWAY",
+              "message": "Internal server error",
+              "requestId": "req_92ca798f-8de6-4b3a-a388-cebca6adb9df"
+            }
+          }
+        },
+        {
+          "status": 500,
+          "durationMs": 46776.2,
+          "error": {
+            "error": {
+              "code": "BAD_GATEWAY",
+              "message": "Internal server error",
+              "requestId": "req_5e5e4d1e-a2e3-43f1-bb82-2292081eec61"
+            }
+          }
+        }
+      ]
+    },
+    "postMessages": {
+      "totalRequests": 5000,
+      "successCount": 301,
+      "errorCount": 4699,
+      "errorRate": 0.9398,
+      "minMs": 1280.32,
+      "maxMs": 38261.92,
+      "p50Ms": 30471.31,
+      "p95Ms": 33798.11,
+      "p99Ms": 37626.73,
+      "failures": [
+        {
+          "status": null,
+          "durationMs": 8946.43,
+          "error": "fetch failed"
+        },
+        {
+          "status": null,
+          "durationMs": 8947.25,
+          "error": "fetch failed"
+        },
+        {
+          "status": null,
+          "durationMs": 8934.89,
+          "error": "fetch failed"
+        },
+        {
+          "status": null,
+          "durationMs": 8935.55,
+          "error": "fetch failed"
+        },
+        {
+          "status": null,
+          "durationMs": 8936.69,
+          "error": "fetch failed"
+        }
+      ]
+    }
+  }
+}

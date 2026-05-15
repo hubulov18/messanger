@@ -1,0 +1,113 @@
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../src/generated/prisma"
+  binaryTargets = ["native", "darwin-arm64", "linux-musl-arm64-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("MEDIA_DATABASE_URL")
+}
+
+enum MediaType {
+  image
+  video
+  audio
+  file
+  avatar
+}
+
+enum ProcessingStatus {
+  pending
+  uploaded
+  processing
+  ready
+  failed
+  deleted
+}
+
+enum UploadSessionStatus {
+  pending
+  uploaded
+  expired
+  cancelled
+}
+
+enum OutboxEventStatus {
+  pending
+  published
+  failed
+}
+
+model MediaObject {
+  id               String           @id
+  ownerUserId      String           @map("owner_user_id")
+  storageKey       String           @unique @map("storage_key")
+  mediaType        MediaType        @map("media_type")
+  mimeType         String           @map("mime_type")
+  sizeBytes        BigInt           @map("size_bytes")
+  checksum         String?
+  processingStatus ProcessingStatus @map("processing_status")
+  createdAt        DateTime         @default(now()) @map("created_at")
+  processedAt      DateTime?        @map("processed_at")
+  deletedAt        DateTime?        @map("deleted_at")
+  variants         MediaVariant[]
+  uploadSessions   UploadSession[]
+
+  @@index([ownerUserId])
+  @@index([processingStatus])
+  @@map("media_objects")
+}
+
+model MediaVariant {
+  id          String      @id
+  mediaId     String      @map("media_id")
+  variantType String      @map("variant_type")
+  storageKey  String      @map("storage_key")
+  width       Int?
+  height      Int?
+  durationMs  Int?        @map("duration_ms")
+  sizeBytes   BigInt?     @map("size_bytes")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  media       MediaObject @relation(fields: [mediaId], references: [id])
+
+  @@unique([mediaId, variantType])
+  @@index([mediaId])
+  @@map("media_variants")
+}
+
+model UploadSession {
+  id          String              @id
+  mediaId     String              @map("media_id")
+  ownerUserId String              @map("owner_user_id")
+  status      UploadSessionStatus
+  checksum    String?
+  expiresAt   DateTime            @map("expires_at")
+  completedAt DateTime?           @map("completed_at")
+  createdAt   DateTime            @default(now()) @map("created_at")
+  media       MediaObject         @relation(fields: [mediaId], references: [id])
+
+  @@index([mediaId])
+  @@index([ownerUserId])
+  @@index([expiresAt])
+  @@map("upload_sessions")
+}
+
+model OutboxEvent {
+  id           String            @id
+  eventType    String            @map("event_type")
+  eventVersion Int               @map("event_version")
+  aggregateId  String            @map("aggregate_id")
+  partitionKey String            @map("partition_key")
+  payloadJson  Json              @map("payload_json")
+  occurredAt   DateTime          @map("occurred_at")
+  publishedAt  DateTime?         @map("published_at")
+  status       OutboxEventStatus
+  attemptCount Int               @default(0) @map("attempt_count")
+  lastError    String?           @map("last_error")
+  lockedAt     DateTime?         @map("locked_at")
+  lockedBy     String?           @map("locked_by")
+
+  @@index([status, occurredAt])
+  @@map("outbox_events")
+}

@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - 'codex/**'
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build --workspace=@telegram/shared
+      - run: npm run typecheck --workspace=@telegram/shared
+      - run: npm run test --workspace=@telegram/shared
+      - run: npm run typecheck --workspace=@telegram/identity-service
+      - run: npm run test --workspace=@telegram/identity-service
+      - run: npm run typecheck --workspace=@telegram/media-service
+      - run: npm run test --workspace=@telegram/media-service
+      - run: npm run build --workspace=@telegram/api-gateway

@@ -1,0 +1,52 @@
+node_modules
+.turbo
+.pnpm-store
+dist
+build
+.DS_Store
+.env
+.env.*
+!.env.example
+coverage
+.expo
+.expo-shared
+ios/build
+android/.gradle
+android/app/build
+android/build
+tmp
+.npm-cache
+*.log
+*.tmp
+*.swp
+*.pem
+
+# React Native / Metro
+metro.log
+.watchmanconfig.local
+apps/mobile-ios/android/.gradle
+apps/mobile-ios/android/build
+apps/mobile-ios/android/app/build
+apps/mobile-ios/android/app/.cxx
+
+# iOS local/generated artifacts
+DerivedData
+apps/mobile-ios/ios/build
+apps/mobile-ios/ios/Pods
+apps/mobile-ios/ios/.xcode.env.local
+apps/mobile-ios/ios/metro.log
+apps/mobile-ios/ios/run-ios.log
+apps/mobile-ios/ios/rn-ios.log
+apps/mobile-ios/ios/xcodebuild.log
+apps/mobile-ios/ios/*.xcuserstate
+apps/mobile-ios/ios/**/*.xcuserdata
+apps/mobile-ios/ios/**/xcuserdata
+apps/mobile-ios/ios/**/*.xcuserdatad
+
+# Ruby / CocoaPods local
+apps/mobile-ios/.bundle
+apps/mobile-ios/vendor/bundle
+
+# Local screenshots / temp artifacts
+artifacts/tmp
+tmp-simulator.png

@@ -1,0 +1,438 @@
+{
+  "startedAt": "2026-04-25T05:00:45.534Z",
+  "finishedAt": "2026-04-25T05:01:35.352Z",
+  "baseUrl": "http://localhost:3000/v1",
+  "setup": {
+    "gatewayHealth": {
+      "ok": false,
+      "status": 404,
+      "body": {
+        "error": {
+          "code": "NOT_FOUND",
+          "message": "Cannot GET /health",
+          "details": "Cannot GET /health",
+          "requestId": "req_ba024f37-821c-4151-b419-58dc3c72cd41"
+        }
+      }
+    },
+    "userCount": 500,
+    "chatCount": 250,
+    "setupConcurrency": 10,
+    "dataTag": "chatlist-sql-liteprojection-v2-500",
+    "chatListLimit": 20,
+    "messageListLimit": 20,
+    "sampleUsers": [
+      {
+        "userId": "user_5a6c0822-8730-46c7-b11d-cd33bc8038b7",
+        "phoneNumber": "+14156814730",
+        "chatId": "chat_da6c5a02-3ede-49ab-8659-b88618a3d0e0",
+        "peerUserId": "user_664671d9-5b44-40ed-8931-f87c4f9b4e44"
+      },
+      {
+        "userId": "user_664671d9-5b44-40ed-8931-f87c4f9b4e44",
+        "phoneNumber": "+14157814730",
+        "chatId": "chat_da6c5a02-3ede-49ab-8659-b88618a3d0e0",
+        "peerUserId": "user_5a6c0822-8730-46c7-b11d-cd33bc8038b7"
+      },
+      {
+        "userId": "user_541956c5-d87f-410d-9b1f-737b3127683c",
+        "phoneNumber": "+14158814730",
+        "chatId": "chat_e51a90fe-dad5-4086-b060-552d27922e86",
+        "peerUserId": "user_c273a2be-8756-4553-b498-c863f6b502c2"
+      },
+      {
+        "userId": "user_c273a2be-8756-4553-b498-c863f6b502c2",
+        "phoneNumber": "+14159814730",
+        "chatId": "chat_e51a90fe-dad5-4086-b060-552d27922e86",
+        "peerUserId": "user_541956c5-d87f-410d-9b1f-737b3127683c"
+      },
+      {
+        "userId": "user_b0710f54-e5b6-42e9-9455-bd9fb1767a13",
+        "phoneNumber": "+14152814731",
+        "chatId": "chat_27c52d16-7da8-4f53-8df6-40a8886d3985",
+        "peerUserId": "user_7399b2af-43c2-424c-b1c1-fe3d7dedf24e"
+      }
+    ],
+    "sampleChats": [
+      {
+        "chatId": "chat_da6c5a02-3ede-49ab-8659-b88618a3d0e0",
+        "leftUserId": "user_5a6c0822-8730-46c7-b11d-cd33bc8038b7",
+        "rightUserId": "user_664671d9-5b44-40ed-8931-f87c4f9b4e44"
+      },
+      {
+        "chatId": "chat_e51a90fe-dad5-4086-b060-552d27922e86",
+        "leftUserId": "user_541956c5-d87f-410d-9b1f-737b3127683c",
+        "rightUserId": "user_c273a2be-8756-4553-b498-c863f6b502c2"
+      },
+      {
+        "chatId": "chat_27c52d16-7da8-4f53-8df6-40a8886d3985",
+        "leftUserId": "user_b0710f54-e5b6-42e9-9455-bd9fb1767a13",
+        "rightUserId": "user_7399b2af-43c2-424c-b1c1-fe3d7dedf24e"
+      },
+      {
+        "chatId": "chat_ec70a680-97fe-447d-9aac-ab7fec5612f1",
+        "leftUserId": "user_fb6d2818-ea9a-4837-a07d-a267f8455e6d",
+        "rightUserId": "user_bf9f1874-6516-41ba-814b-0cf4fd4225e2"
+      },
+      {
+        "chatId": "chat_75da9044-8b30-477b-b4e3-f90d71264838",
+        "leftUserId": "user_621d6be2-e1fb-45f6-bb7a-51e702ecc90e",
+        "rightUserId": "user_3ac6b32a-8b41-4a7c-a4dd-e97a5d1c1d91"
+      }
+    ]
+  },
+  "summary": {
+    "scenario": {
+      "totalRequests": 500,
+      "successCount": 15,
+      "errorCount": 485,
+      "errorRate": 0.97,
+      "minMs": 11136.81,
+      "maxMs": 34182.42,
+      "p50Ms": 24254.21,
+      "p95Ms": 33444.04,
+      "p99Ms": 33852.09,
+      "failures": [
+        {
+          "status": null,
+          "durationMs": 11136.81,
+          "error": {
+            "error": {
+              "code": "UPSTREAM_TIMEOUT",
+              "message": "The upstream service did not respond in time.",
+              "details": {
+                "target": "message",
+                "path": "v1/messages"
+              },
+              "requestId": "req_75506d97-9b41-4941-b489-52fd318d676a"
+            }
+          }
+        },
+        {
+          "status": null,
+          "durationMs": 12500.4,
+          "error": {
+            "error": {
+              "code": "UPSTREAM_TIMEOUT",
+              "message": "The upstream service did not respond in time.",
+              "details": {
+                "target": "message",
+                "path": "v1/messages"
+              },
+              "requestId": "req_38133d4f-0a82-40ea-8713-7ab6cecb47c5"
+            }
+          }
+        },
+        {
+          "status": null,
+          "durationMs": 13704.86,
+          "error": {
+            "error": {
+              "code": "UPSTREAM_TIMEOUT",
+              "message": "The upstream service did not respond in time.",
+              "details": {
+                "target": "message",
+                "path": "v1/messages"
+              },
+              "requestId": "req_91bbef96-0d53-49a4-9dd4-e37cbaecacb8"
+            }
+          }
+        },
+        {
+          "status": null,
+          "durationMs": 15288.73,
+          "error": {
+            "error": {
+              "code": "UPSTREAM_TIMEOUT",
+              "message": "The upstream service did not respond in time.",
+              "details": {
+                "target": "message",
+                "path": "v1/messages"
+              },
+              "requestId": "req_0b0ee6a7-e58d-4f87-b08a-9ca963e35e14"
+            }
+          }
+        },
+        {
+          "status": null,
+          "durationMs": 15294.07,
+          "error": {
+            "error": {
+              "code": "UPSTREAM_TIMEOUT",
+              "message": "The upstream service did not respond in time.",
+              "details": {
+                "target": "message",
+                "path": "v1/messages"
+              },
+              "requestId": "req_d5371daa-7711-4f4a-9ffe-d306c6826625"
+            }
+          }
+        }
+      ]
+    },
+    "getChats": {
+      "totalRequests": 500,
+      "successCount": 359,
+      "errorCount": 141,
+      "errorRate": 0.282,
+      "minMs": 383.45,
+      "maxMs": 12623.85,
+      "p50Ms": 6888.15,
+      "p95Ms": 12297.78,
+      "p99Ms": 12560.05,
+      "failures": [
+        {
+          "status": 504,
+          "durationMs": 10687.65,
+          "error": {
+            "error": {
+              "code": "UPSTREAM_TIMEOUT",
+              "message": "The upstream service did not respond in time.",
+              "details": {
+                "target": "chat",
+                "path": "v1/chats"
+              },
+              "requestId": "req_961bcbb0-add8-499b-9884-7f9b588cc85a"
+            }
+          }
+        },
+        {
+          "status": 504,
+          "durationMs": 10679.29,
+          "error": {
+            "error": {
+              "code": "UPSTREAM_TIMEOUT",
+              "message": "The upstream service did not respond in time.",
+              "details": {
+                "target": "chat",
+                "path": "v1/chats"
+              },
+              "requestId": "req_51701446-026c-42d4-b021-3d66deb11009"
+            }
+          }
+        },
+        {
+          "status": 504,
+          "durationMs": 10679.71,
+          "error": {
+            "error": {
+              "code": "UPSTREAM_TIMEOUT",
+              "message": "The upstream service did not respond in time.",
+              "details": {
+                "target": "chat",
+                "path": "v1/chats"
+              },
+              "requestId": "req_abd9feb9-ea3a-423f-a09c-7c5e6094b39d"
+            }
+          }
+        },
+        {
+          "status": 504,
+          "durationMs": 10679.81,
+          "error": {
+            "error": {
+              "code": "UPSTREAM_TIMEOUT",
+              "message": "The upstream service did not respond in time.",
+              "details": {
+                "target": "chat",
+                "path": "v1/chats"
+              },
+              "requestId": "req_bbe69d63-ae86-4471-96a8-5c1844da80ae"
+            }
+          }
+        },
+        {
+          "status": 504,
+          "durationMs": 10695.78,
+          "error": {
+            "error": {
+              "code": "UPSTREAM_TIMEOUT",
+              "message": "The upstream service did not respond in time.",
+              "details": {
+                "target": "chat",
+                "path": "v1/chats"
+              },
+              "requestId": "req_f12a2eee-21dd-47a0-9bed-80dd880850b1"
+            }
+          }
+        }
+      ]
+    },
+    "getMessages": {
+      "totalRequests": 500,
+      "successCount": 297,
+      "errorCount": 203,
+      "errorRate": 0.406,
+      "minMs": 376.75,
+      "maxMs": 13407.95,
+      "p50Ms": 6715.45,
+      "p95Ms": 11082.28,
+      "p99Ms": 11241.92,
+      "failures": [
+        {
+          "status": 504,
+          "durationMs": 10027.75,
+          "error": {
+            "error": {
+              "code": "UPSTREAM_TIMEOUT",
+              "message": "The upstream service did not respond in time.",
+              "details": {
+                "target": "message",
+                "path": "v1/chats/chat_41302bad-b4ab-499c-b6e3-22ed036c537a/messages"
+              },
+              "requestId": "req_abb5f1c4-4470-4f67-bc05-93091020b4a9"
+            }
+          }
+        },
+        {
+          "status": 504,
+          "durationMs": 10028.62,
+          "error": {
+            "error": {
+              "code": "UPSTREAM_TIMEOUT",
+              "message": "The upstream service did not respond in time.",
+              "details": {
+                "target": "message",
+                "path": "v1/chats/chat_3149102e-ca7b-416f-bfbb-9c26d29e3001/messages"
+              },
+              "requestId": "req_d1a06eaf-973e-40fb-846b-4c1d93c10a38"
+            }
+          }
+        },
+        {
+          "status": 504,
+          "durationMs": 10073.02,
+          "error": {
+            "error": {
+              "code": "UPSTREAM_TIMEOUT",
+              "message": "The upstream service did not respond in time.",
+              "details": {
+                "target": "message",
+                "path": "v1/chats/chat_43948015-8add-4877-b3d8-c90e615f34e8/messages"
+              },
+              "requestId": "req_e302029e-b42d-49fc-8c64-7c938d5e501c"
+            }
+          }
+        },
+        {
+          "status": 504,
+          "durationMs": 10113.05,
+          "error": {
+            "error": {
+              "code": "UPSTREAM_TIMEOUT",
+              "message": "The upstream service did not respond in time.",
+              "details": {
+                "target": "message",
+                "path": "v1/chats/chat_29894ab7-edf5-400e-9289-28561d54f613/messages"
+              },
+              "requestId": "req_7859756d-d30d-467e-a6cf-6429172e31fb"
+            }
+          }
+        },
+        {
+          "status": 504,
+          "durationMs": 10113.56,
+          "error": {
+            "error": {
+              "code": "UPSTREAM_TIMEOUT",
+              "message": "The upstream service did not respond in time.",
+              "details": {
+                "target": "message",
+                "path": "v1/chats/chat_f478cb08-53b2-4c76-ad10-02e34eb35302/messages"
+              },
+              "requestId": "req_6289a52d-3417-4c85-81cd-5416505264ce"
+            }
+          }
+        }
+      ]
+    },
+    "postMessages": {
+      "totalRequests": 500,
+      "successCount": 22,
+      "errorCount": 478,
+      "errorRate": 0.956,
+      "minMs": 8492.35,
+      "maxMs": 12202.49,
+      "p50Ms": 10107.36,
+      "p95Ms": 11097.86,
+      "p99Ms": 11219.05,
+      "failures": [
+        {
+          "status": 504,
+          "durationMs": 10376.13,
+          "error": {
+            "error": {
+              "code": "UPSTREAM_TIMEOUT",
+              "message": "The upstream service did not respond in time.",
+              "details": {
+                "target": "message",
+                "path": "v1/messages"
+              },
+              "requestId": "req_75506d97-9b41-4941-b489-52fd318d676a"
+            }
+          }
+        },
+        {
+          "status": 504,
+          "durationMs": 10729.43,
+          "error": {
+            "error": {
+              "code": "UPSTREAM_TIMEOUT",
+              "message": "The upstream service did not respond in time.",
+              "details": {
+                "target": "message",
+                "path": "v1/messages"
+              },
+              "requestId": "req_38133d4f-0a82-40ea-8713-7ab6cecb47c5"
+            }
+          }
+        },
+        {
+          "status": 504,
+          "durationMs": 10032.88,
+          "error": {
+            "error": {
+              "code": "UPSTREAM_TIMEOUT",
+              "message": "The upstream service did not respond in time.",
+              "details": {
+                "target": "message",
+                "path": "v1/messages"
+              },
+              "requestId": "req_91bbef96-0d53-49a4-9dd4-e37cbaecacb8"
+            }
+          }
+        },
+        {
+          "status": 504,
+          "durationMs": 10011.85,
+          "error": {
+            "error": {
+              "code": "UPSTREAM_TIMEOUT",
+              "message": "The upstream service did not respond in time.",
+              "details": {
+                "target": "message",
+                "path": "v1/messages"
+              },
+              "requestId": "req_0b0ee6a7-e58d-4f87-b08a-9ca963e35e14"
+            }
+          }
+        },
+        {
+          "status": 504,
+          "durationMs": 10013.88,
+          "error": {
+            "error": {
+              "code": "UPSTREAM_TIMEOUT",
+              "message": "The upstream service did not respond in time.",
+              "details": {
+                "target": "message",
+                "path": "v1/messages"
+              },
+              "requestId": "req_d5371daa-7711-4f4a-9ffe-d306c6826625"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

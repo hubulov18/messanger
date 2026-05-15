@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("NOTIFICATION_DATABASE_URL")
+}
+
+enum DevicePlatform {
+  ios
+  android
+  web
+}
+
+enum NotificationDeliveryStatus {
+  pending
+  sent
+  failed
+}
+
+model DeviceRegistration {
+  id               String         @id
+  userId           String         @map("user_id")
+  platform         DevicePlatform
+  deviceId         String         @map("device_id")
+  pushToken        String?        @map("push_token")
+  voipPushToken    String?        @map("voip_push_token")
+  appVersion       String?        @map("app_version")
+  lastRegisteredAt DateTime       @default(now()) @map("last_registered_at")
+  revokedAt        DateTime?      @map("revoked_at")
+
+  @@unique([userId, deviceId])
+  @@index([pushToken])
+  @@index([voipPushToken])
+  @@index([revokedAt])
+  @@map("device_registrations")
+}
+
+model NotificationPreference {
+  id          String    @id
+  userId      String    @map("user_id")
+  chatId      String?   @map("chat_id")
+  isMuted     Boolean   @default(false) @map("is_muted")
+  muteUntil   DateTime? @map("mute_until")
+  showPreview Boolean   @default(true) @map("show_preview")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@unique([userId, chatId])
+  @@index([userId])
+  @@map("notification_preferences")
+}
+
+model NotificationDeliveryLog {
+  id            String                     @id
+  userId        String                     @map("user_id")
+  sourceEventId String                     @map("source_event_id")
+  provider      String
+  status        NotificationDeliveryStatus
+  reasonCode    String?                    @map("reason_code")
+  createdAt     DateTime                   @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([sourceEventId])
+  @@index([status])
+  @@map("notification_delivery_log")
+}

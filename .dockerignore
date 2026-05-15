@@ -1,0 +1,17 @@
+node_modules
+.npm-cache
+.git
+.gitignore
+.turbo
+**/.turbo
+**/node_modules
+**/dist
+# Exclude build output directories but keep scripts/build/ helper scripts
+**/ios/build
+**/android/app/build
+**/apps/**/build
+**/packages/**/build
+**/.DS_Store
+apps/mobile-ios
+apps/mobile-ios/ios/build
+apps/mobile-ios/android/app/build
